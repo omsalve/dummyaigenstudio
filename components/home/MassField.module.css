@@ -1,0 +1,594 @@
+/*
+ * MassField
+ *
+ * Desktop: a tall section whose 100vh stage sticks while two word columns
+ * rise past a central image. MassField.tsx bows each column along a cosine,
+ * out to the screen edge at the hairline and in toward the image above and
+ * below it, so the columns read as a "(" and a ")" around the frame. The word
+ * on the hairline lights up and turns into its bracketed form; the frame shows
+ * that service's category and takes the image's shape. Notes drift past at page
+ * speed over the pinned stage. Phones and reduced motion use the flow layout
+ * at the bottom: image on top, columns under it.
+ */
+
+@property --frame-ratio {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0.8; /* keep in sync with DEFAULT_RATIO in MassField.tsx */
+}
+
+.root {
+  /* Colour: this chapter is set in ink, with the board's ivory as its light. */
+  --field-bg: var(--lmr-ink);
+  --field-fg: var(--lmr-ivory);
+  --field-dim: color-mix(in srgb, var(--field-fg) 25%, transparent); /* words off the hairline */
+  --field-muted: color-mix(in srgb, var(--field-fg) 62%, transparent); /* captions, notes, cue */
+  --field-rule: color-mix(in srgb, var(--field-fg) 18%, transparent);
+
+  /* Tuning (curve and timing constants live at the top of MassField.tsx) */
+  --field-word: clamp(1.125rem, min(2.5vw, 4.5vh), 4rem);
+  --field-leading: 1.375;
+  --field-pitch: calc(var(--field-word) * var(--field-leading));
+  --field-margin: 5.5vw; /* screen edge → each column's outer edge */
+  --field-scroll: 2.2; /* page px scrolled per px the columns rise */
+  --frame-max-w: 15vw; /* the frame fits each image inside this box */
+  --frame-max-h: 30vh;
+  --field-swap: 520ms; /* a word turning into its bracketed form */
+  --field-crossfade: 700ms;
+  --field-morph: 900ms; /* the frame changing shape */
+
+  /* The page's semantic colours, inverted for this chapter. */
+  --color-bg: var(--field-bg);
+  --color-fg: var(--field-fg);
+  --color-rule: var(--field-rule);
+
+  position: relative;
+  /* One stage, plus enough scroll for every row (--field-rows, set inline) to reach the hairline. */
+  height: calc(100vh + (var(--field-rows, 1) - 1) * var(--field-pitch) * var(--field-scroll));
+  height: calc(100svh + (var(--field-rows, 1) - 1) * var(--field-pitch) * var(--field-scroll));
+  overflow-x: clip;
+  background: var(--field-bg);
+  color: var(--field-fg);
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* ---------- Light and grain ---------- */
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Centred left of centre; MassField.tsx eases it after a fine pointer. Offsets, not translate, so its transform stays GSAP's. */
+.glow {
+  --glow-size: 95vmax;
+
+  position: absolute;
+  top: calc(56% - var(--glow-size) / 2);
+  left: calc(24% - var(--glow-size) / 2);
+  width: var(--glow-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--field-fg) 15%, transparent),
+    color-mix(in srgb, var(--field-fg) 6%, transparent) 45%,
+    transparent
+  );
+  will-change: transform;
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px;
+  mix-blend-mode: overlay;
+  opacity: 0.32;
+  pointer-events: none;
+}
+
+/* ---------- Hairline, frame and labels ---------- */
+
+.mass {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hairline {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--field-rule);
+}
+
+.frame {
+  --frame-w: min(var(--frame-max-w), var(--frame-max-h) * var(--frame-ratio));
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--frame-w);
+  height: calc(var(--frame-w) / var(--frame-ratio));
+  overflow: hidden;
+  background: color-mix(in srgb, var(--field-fg) 8%, transparent);
+  transform: translate(-50%, -50%);
+  transition: --frame-ratio var(--field-morph) var(--ease-in-out);
+}
+
+.image {
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--field-crossfade) ease;
+}
+
+.image[data-active] {
+  opacity: 1;
+}
+
+/* Difference-blended over the image, so it inverts whatever passes beneath it. */
+.frameLabel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: var(--field-fg);
+  font-size: 0.8125rem;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  mix-blend-mode: difference;
+  transform: translate(-50%, -50%);
+}
+
+/* The brackets are decoration: the "/ ''" alt text keeps them out of the accessible name. */
+.frameLabel::before,
+.tagline::before {
+  content: "( ";
+  content: "( " / "";
+}
+
+.frameLabel::after,
+.tagline::after {
+  content: " )";
+  content: " )" / "";
+}
+
+.tagline {
+  position: absolute;
+  bottom: calc(50% + var(--frame-max-h) / 2 + clamp(1rem, 4.5vh, 2.75rem));
+  left: 50%;
+  z-index: 3;
+  margin: 0;
+  color: color-mix(in srgb, var(--field-fg) 88%, transparent);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  line-height: 1.3;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.caption {
+  position: absolute;
+  top: clamp(1.25rem, 4.5vh, 2.75rem);
+  z-index: 3;
+  margin: 0;
+  color: var(--field-muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.captionServices {
+  left: var(--field-margin);
+}
+
+.captionIndustries {
+  right: var(--field-margin);
+}
+
+/* ---------- Columns ---------- */
+
+/* Starts with the first word on the hairline; MassField.tsx raises it from there. */
+.column {
+  position: absolute;
+  top: calc(50% - var(--field-pitch) / 2);
+  z-index: 2;
+}
+
+.columnServices {
+  left: var(--field-margin);
+  text-align: left;
+}
+
+.columnIndustries {
+  right: var(--field-margin);
+  text-align: right;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.word {
+  position: relative;
+  display: block;
+  margin: 0;
+  font-size: var(--field-word);
+  font-weight: 400;
+  line-height: var(--field-leading);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color var(--field-swap) var(--ease-out);
+}
+
+.wordText,
+.wordAlt {
+  transition:
+    opacity var(--field-swap) var(--ease-out),
+    transform var(--field-swap) var(--ease-out),
+    filter var(--field-swap) var(--ease-out);
+}
+
+.wordText {
+  display: inline-block;
+}
+
+/* The bracketed form: same words, in the accent italic, anchored to the column's outer edge. */
+.wordAlt {
+  position: absolute;
+  top: 50%;
+  font-family: var(--font-accent);
+  font-size: 1.22em;
+  font-style: italic;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: none;
+  opacity: 0;
+  filter: blur(0.08em);
+  transform: translateY(-50%) translateY(0.32em);
+  pointer-events: none;
+}
+
+.wordAlt::before,
+.wordAlt::after {
+  font-family: var(--font-sans);
+  font-size: 0.82em;
+  font-style: normal;
+  font-weight: 300;
+}
+
+.wordAlt::before {
+  content: "( ";
+}
+
+.wordAlt::after {
+  content: " )";
+}
+
+.columnServices .wordAlt {
+  left: 0;
+}
+
+.columnIndustries .wordAlt {
+  right: 0;
+}
+
+.word[data-active] .wordText {
+  opacity: 0;
+  filter: blur(0.08em);
+  transform: translateY(-0.32em);
+}
+
+.word[data-active] .wordAlt {
+  opacity: 1;
+  filter: none;
+  transform: translateY(-50%);
+}
+
+/* Each group's name carries its number, hung in the margin outside the column. */
+.wordIndex {
+  position: absolute;
+  top: 0.55em;
+  color: var(--field-muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.columnServices .wordIndex {
+  right: calc(100% + 1.1em);
+}
+
+.columnIndustries .wordIndex {
+  left: calc(100% + 1.1em);
+}
+
+/* Set once the field is live; until then (and under reduced motion) every word is at full strength. */
+.root[data-ready] .word {
+  color: var(--field-dim);
+  will-change: transform;
+}
+
+.root[data-ready] .word[data-active] {
+  color: var(--field-fg);
+}
+
+.root[data-ready] .column {
+  will-change: transform;
+}
+
+/* Pointing at a word previews its bracketed form, without lighting it. */
+@media (hover: hover) and (pointer: fine) {
+  .root[data-ready] .word:hover .wordText {
+    opacity: 0;
+    filter: blur(0.08em);
+    transform: translateY(-0.32em);
+  }
+
+  .root[data-ready] .word:hover .wordAlt {
+    opacity: 1;
+    filter: none;
+    transform: translateY(-50%);
+  }
+}
+
+/* ---------- Scroll cue ---------- */
+
+.cue {
+  position: absolute;
+  bottom: clamp(1.25rem, 5vh, 3rem);
+  left: 50%;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 0.8rem;
+  margin: 0;
+  color: var(--field-muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  transition: opacity 500ms var(--ease-out);
+}
+
+.root[data-end] .cue {
+  opacity: 0;
+}
+
+.chevron {
+  display: grid;
+  grid-template-columns: repeat(5, 0.3125rem);
+  grid-template-rows: repeat(3, 0.3125rem);
+  animation: cue-drop 1.6s steps(1, end) infinite;
+}
+
+.chevron span {
+  background: currentColor;
+}
+
+@keyframes cue-drop {
+  50% {
+    transform: translateY(0.3125rem);
+  }
+}
+
+/* ---------- Notes ---------- */
+
+/* Spans the whole section, so notes scroll at page speed over the pinned stage. */
+.notes {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: clip;
+  pointer-events: none;
+}
+
+.note {
+  position: absolute;
+  display: grid;
+  gap: 0.5em;
+  margin: 0;
+  color: var(--field-muted);
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+/* Slots, with the windows in NOTE_WINDOWS (MassField.tsx) that keep each clear of the words. */
+.note[data-slot="0"] {
+  top: 17%;
+  right: calc(var(--field-margin) + 1vw);
+  justify-items: center;
+  text-align: center;
+}
+
+.note[data-slot="1"],
+.note[data-slot="2"] {
+  left: calc(50% + var(--frame-max-w) / 2 + 2.5vw);
+}
+
+.note[data-slot="1"] {
+  top: 41%;
+}
+
+.note[data-slot="2"] {
+  top: 66%;
+}
+
+.noteLine {
+  display: block;
+  white-space: nowrap;
+}
+
+.caret {
+  display: block;
+  width: 0.6em;
+  height: 1.05em;
+  margin-top: 0.15em;
+  background: currentColor;
+  animation: caret-blink 1.06s steps(1, end) infinite;
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Below this the gaps the notes sit in close up. */
+@media (max-width: 1099.98px) {
+  .notes {
+    display: none;
+  }
+}
+
+/* ---------- Flow layout ---------- */
+
+/* Phones, and reduced motion at any width. Keep the first query in sync with NARROW_QUERY. */
+@media (max-width: 767.98px), (prefers-reduced-motion: reduce) {
+  .root {
+    --frame-max-w: 26vw;
+    --frame-max-h: 42vh;
+
+    height: auto;
+  }
+
+  /* Padding on the stage, not the root, so the light and grain reach the section's edges. */
+  .stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--grid-gap);
+    height: auto;
+    padding: clamp(4rem, 10vh, 7rem) var(--gutter);
+    overflow: hidden;
+  }
+
+  .tagline {
+    position: static;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    justify-self: center;
+    margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+    transform: none;
+  }
+
+  .mass {
+    position: relative;
+    inset: auto;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    height: var(--frame-max-h);
+    margin-bottom: clamp(2.5rem, 6vh, 4rem);
+  }
+
+  .hairline {
+    right: calc(-1 * var(--gutter));
+    left: calc(-1 * var(--gutter));
+  }
+
+  .caption {
+    position: static;
+    grid-row: 3;
+    margin-bottom: 1.25rem;
+  }
+
+  .captionServices {
+    grid-column: 1;
+  }
+
+  .captionIndustries {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  .column,
+  .columnServices,
+  .columnIndustries {
+    position: relative;
+    inset: auto;
+    grid-row: 4;
+  }
+
+  .columnServices {
+    grid-column: 1;
+  }
+
+  .columnIndustries {
+    grid-column: 2;
+  }
+
+  .word {
+    white-space: normal;
+  }
+
+  /* Inline here, so it steps aside while the bracketed form is showing. */
+  .wordIndex {
+    position: static;
+    margin-inline-end: 0.6em;
+    vertical-align: 0.35em;
+    transition: opacity var(--field-swap) var(--ease-out);
+  }
+
+  .word[data-active] .wordIndex {
+    opacity: 0;
+  }
+
+  .cue,
+  .notes {
+    display: none;
+  }
+}
+
+/* Phones only: a larger image and smaller type. */
+@media (max-width: 767.98px) {
+  .root {
+    --field-word: clamp(0.8125rem, 3.4vw, 1.125rem);
+    --frame-max-w: 46vw;
+    --frame-max-h: 58vw;
+  }
+
+  .wordAlt {
+    font-size: 1.12em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame,
+  .image,
+  .word,
+  .wordText,
+  .wordAlt {
+    transition: none;
+  }
+
+  .chevron,
+  .caret {
+    animation: none;
+  }
+}

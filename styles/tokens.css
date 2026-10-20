@@ -1,0 +1,85 @@
+/*
+ * LMR design tokens — PROVISIONAL
+ *
+ * [SCAFFOLD] The scaffold's styles/tokens.css was not in this repo when the
+ * signature components were built, so these values are lifted from
+ * "Light Matter Reality Brand Palette Board.png". Components only read the
+ * semantic names below (--color-*, --v-*, --font-*, --text-*, --ease-*,
+ * --gutter, --grid-*), so the real file can replace this one as long as it
+ * defines (or aliases) the same names.
+ */
+
+:root {
+  /* Palette primitives — the board's shared neutrals */
+  --lmr-ivory: #f7f5f0;
+  --lmr-ink: #1a1a1a;
+  --lmr-sand: #d9c9b8;
+  --lmr-stone: #6b6b63;
+
+  /* Colour */
+  --color-bg: var(--lmr-ivory);
+  --color-fg: var(--lmr-ink);
+  --color-fg-muted: var(--lmr-stone);
+  --color-rule: color-mix(in srgb, var(--lmr-ink) 16%, transparent);
+  --color-on-media: var(--lmr-ivory);
+
+  /* Type */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  /* Accent italic: set with font-style: italic. */
+  --font-accent: var(--font-accent-italic), ui-serif, Georgia, serif;
+  --text-label: 0.6875rem;
+  --tracking-label: 0.22em;
+  --weight-label: 500;
+  --text-display: clamp(2.75rem, 1.4rem + 5vw, 6.25rem);
+  --leading-display: 0.96;
+  --tracking-display: -0.035em;
+  --text-card-title: clamp(0.9375rem, 0.82rem + 0.3vw, 1.125rem);
+
+  /* Layout */
+  --container-max: 1680px;
+  --gutter: clamp(1rem, 3.2vw, 3rem);
+  --grid-columns: 12;
+  --grid-gap: clamp(0.75rem, 1.4vw, 1.5rem);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/*
+ * Vertical palettes, applied with data-vertical. Each vertical gets the
+ * board's five swatches: accent, deep, paper, sand, stone.
+ * [BRIEF] The ids are placeholders named after the board's palettes; rename
+ * them to the brief's vertical ids (content/verticals.ts) when it lands.
+ */
+[data-vertical="solar"] {
+  --v-accent: #ff4d00;
+  --v-deep: #1a1a1a;
+  --v-paper: #f7f5f0;
+  --v-sand: #d9c9b8;
+  --v-stone: #6b6b63;
+}
+
+[data-vertical="cobalt"] {
+  --v-accent: #0057ff;
+  --v-deep: #0a1f44;
+  --v-paper: #f6f4ee;
+  --v-sand: #cbc6bd;
+  --v-stone: #222222;
+}
+
+[data-vertical="citrus"] {
+  --v-accent: #d7ff00;
+  --v-deep: #1f2a1f;
+  --v-paper: #f7f4ee;
+  --v-sand: #d8cdba;
+  --v-stone: #6f756a;
+}
+
+[data-vertical="coral"] {
+  --v-accent: #ff6b6b;
+  --v-deep: #4b1f26;
+  --v-paper: #f7f3ef;
+  --v-sand: #dcc9bc;
+  --v-stone: #7a6a69;
+}

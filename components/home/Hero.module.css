@@ -1,0 +1,130 @@
+/*
+ * Hero
+ *
+ * Full-bleed and cinematic, as on the palette board's hero panels: the
+ * flagship on show fills the frame (HeroReel), the statement is set over it
+ * in ivory at the lower left like a title card, and the flagships run along
+ * the bottom as chapters. The text block follows the board: statement,
+ * lockup, a short rule, the action.
+ */
+
+.hero {
+  /* Tuning */
+  --hero-pad-top: clamp(5rem, 14svh, 9rem);
+  --hero-pad-bottom: clamp(1.25rem, 4svh, 2.5rem);
+  --hero-statement: clamp(2.75rem, 6.2vw, 7.25rem); /* each sentence holds one line of the 7-column measure */
+  --hero-column: calc((var(--container-max) - (var(--grid-columns) - 1) * var(--grid-gap)) / var(--grid-columns));
+
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns:
+    [full-start] minmax(calc(var(--gutter) - var(--grid-gap)), 1fr)
+    [content-start] repeat(var(--grid-columns), minmax(0, var(--hero-column)))
+    [content-end] minmax(calc(var(--gutter) - var(--grid-gap)), 1fr)
+    [full-end];
+  grid-template-rows: 1fr auto;
+  column-gap: var(--grid-gap);
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-block: var(--hero-pad-top) var(--hero-pad-bottom);
+  overflow: clip;
+  color: var(--lmr-ivory);
+  background: var(--lmr-ink);
+}
+
+.hero ::selection {
+  background: var(--lmr-ivory);
+  color: var(--lmr-ink);
+}
+
+.thought {
+  position: relative;
+  z-index: 1;
+  grid-column: content-start / span 7;
+  grid-row: 1;
+  align-self: end;
+  padding-bottom: clamp(2.5rem, 7svh, 5rem);
+}
+
+.chapters {
+  position: relative;
+  z-index: 1;
+  grid-column: content-start / content-end;
+  grid-row: 2;
+}
+
+.statement {
+  margin: 0;
+  font-size: var(--hero-statement);
+  font-weight: 400;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+/* Hyphenated compounds ("Real-world") never break at the hyphen. */
+.compound {
+  white-space: nowrap;
+}
+
+/* Instrument Serif sits small beside Geist; the size step evens the x-heights. */
+.accent {
+  font-family: var(--font-accent);
+  font-size: 1.12em;
+  font-style: italic;
+  line-height: calc(var(--leading-display) / 1.12);
+  letter-spacing: -0.01em;
+}
+
+.lockup {
+  margin-top: clamp(1.5rem, 4svh, 2.5rem);
+}
+
+.rule {
+  display: block;
+  width: 1.5rem;
+  height: 1px;
+  margin-block: clamp(1.125rem, 2.6svh, 1.625rem) clamp(0.5rem, 1.2svh, 0.75rem);
+  background: currentColor;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding-block: 0.625rem;
+  color: inherit;
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 calc(100% - 0.25rem) / 0 1px;
+  transition: background-size 450ms var(--ease-out);
+}
+
+.action svg {
+  flex: none;
+  transition: transform 450ms var(--ease-out);
+}
+
+.action:hover {
+  background-size: calc(100% - 18px - 0.875rem) 1px;
+}
+
+.action:hover svg {
+  transform: translateX(0.3rem);
+}
+
+.action:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (max-width: 767.98px) {
+  .thought {
+    grid-column: content-start / content-end;
+  }
+}
