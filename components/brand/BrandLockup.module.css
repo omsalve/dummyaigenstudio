@@ -1,0 +1,10 @@
+.label {
+  display: grid;
+  gap: 0.55em;
+  margin: 0;
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1.2;
+  text-transform: uppercase;
+}

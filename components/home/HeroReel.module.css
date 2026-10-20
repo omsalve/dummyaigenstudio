@@ -1,0 +1,284 @@
+/*
+ * HeroReel
+ *
+ * Films: every flagship's poster and clip, stacked full-bleed behind the hero.
+ * With the fluid on, the canvas draws over them (they are its sources); the
+ * next film is poured in as ink rising from its chapter, and the pointer
+ * ripples the film like liquid. Without it, the films crossfade.
+ *
+ * Chapters: the flagships run along the bottom like a film's chapter bar.
+ * Each has a progress line; the active one's is the reel's timer (HeroReel.tsx
+ * advances on its animationend), so anything that pauses the line pauses the
+ * reel: hover, focus, the toggle, scrolling away.
+ */
+
+/* ---------- Films ---------- */
+
+.films {
+  /* Tuning */
+  --reel-crossfade: 900ms; /* the fallback swap */
+  --reel-canvas-fade: 700ms;
+  --reel-shade: 0.62; /* ink behind the statement and chapters */
+
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--lmr-ink);
+}
+
+.film {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--reel-crossfade) var(--ease-out);
+}
+
+.film[data-active] {
+  opacity: 1;
+}
+
+.poster,
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video {
+  opacity: 0;
+  transition: opacity 240ms var(--ease-out);
+}
+
+.film[data-ready] .video {
+  opacity: 1;
+}
+
+/* The fluid draws over the films once it has a real frame up. */
+.canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity var(--reel-canvas-fade) var(--ease-out);
+}
+
+.canvas[data-ready] {
+  opacity: 1;
+}
+
+/* Legibility: ink pooled under the statement (lower left) and along the chapters. */
+.shade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      120% 85% at 0% 100%,
+      color-mix(in srgb, var(--lmr-ink) calc(var(--reel-shade) * 100%), transparent),
+      transparent 62%
+    ),
+    linear-gradient(to top, color-mix(in srgb, var(--lmr-ink) calc(var(--reel-shade) * 125%), transparent), transparent 42%),
+    linear-gradient(to bottom, color-mix(in srgb, var(--lmr-ink) 28%, transparent), transparent 18%);
+  pointer-events: none;
+}
+
+/* ---------- Chapters ---------- */
+
+.chapters {
+  /* Tuning */
+  --reel-dwell: 7s; /* how long each flagship holds the screen */
+  --reel-dim: 0.56; /* chapters not on show */
+
+  display: grid;
+  gap: clamp(0.875rem, 2svh, 1.25rem);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.label,
+.toggle,
+.num,
+.tag {
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  margin: 0;
+  opacity: 0.72;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
+  margin: -0.625rem -0.5rem;
+  padding: 0.625rem 0.5rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.toggle:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 0;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(var(--reel-count, 4), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chapter {
+  position: relative;
+  min-width: 0;
+}
+
+.link {
+  display: grid;
+  gap: 0.5rem;
+  padding-block: clamp(0.875rem, 2svh, 1.25rem) 0.25rem;
+  color: inherit;
+  text-decoration: none;
+  opacity: var(--reel-dim);
+  transition: opacity 400ms ease;
+}
+
+.chapter[data-active] .link,
+.link:hover {
+  opacity: 1;
+}
+
+.link:focus-visible {
+  opacity: 1;
+  outline: 1px solid currentColor;
+  outline-offset: 4px;
+}
+
+.num {
+  display: block;
+}
+
+.title {
+  overflow: hidden;
+  font-size: clamp(1rem, 0.85rem + 0.45vw, 1.375rem);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.875rem;
+  font-family: var(--font-accent);
+  font-size: clamp(0.9375rem, 0.85rem + 0.25vw, 1.125rem);
+  font-style: italic;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.tag {
+  font-family: var(--font-sans);
+  font-style: normal;
+  opacity: 0.8;
+}
+
+/* The chapter's progress line: a hairline track, filled in the vertical's accent. */
+.dwell {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  overflow: hidden;
+  background: color-mix(in srgb, currentColor 28%, transparent);
+  pointer-events: none;
+}
+
+.dwellFill {
+  display: block;
+  height: 100%;
+  background: var(--v-accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.chapter[data-active] .dwellFill {
+  animation: dwell var(--reel-dwell) linear both;
+}
+
+.chapters[data-hold] .dwellFill,
+.chapters[data-paused] .dwellFill,
+.chapters[data-offscreen] .dwellFill {
+  animation-play-state: paused;
+}
+
+@keyframes dwell {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Reduced motion: films crossfade on hover or focus, and nothing advances on its own. */
+@media (prefers-reduced-motion: reduce) {
+  .film,
+  .video {
+    transition-duration: 300ms;
+  }
+
+  .dwellFill {
+    animation: none !important;
+  }
+
+  .chapter[data-active] .dwellFill {
+    transform: scaleX(1);
+  }
+}
+
+/* Phones: the type covers more of the frame, so the shade climbs higher; chapters in two rows of two. Keep in sync with NARROW_QUERY in lib/media-queries.ts. */
+@media (max-width: 767.98px) {
+  .shade {
+    background:
+      linear-gradient(
+        to top,
+        color-mix(in srgb, var(--lmr-ink) 86%, transparent),
+        color-mix(in srgb, var(--lmr-ink) 62%, transparent) 45%,
+        transparent 72%
+      ),
+      linear-gradient(to bottom, color-mix(in srgb, var(--lmr-ink) 30%, transparent), transparent 18%);
+  }
+
+  .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 0.5rem;
+  }
+
+  .title {
+    font-size: 0.9375rem;
+  }
+
+  .meta {
+    display: none;
+  }
+}
