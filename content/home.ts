@@ -47,6 +47,18 @@ export const hero = {
   },
 } as const;
 
+export const about = {
+  /** Small label over the statement. */
+  eyebrow: "About us",
+  /** The section's heading. */
+  statement: "We were here before AI.",
+  /** Set in the script. A word or two, lowercase, verbatim from the statement. */
+  statementAccent: "before",
+  body: "We’re an end-to-end production partner. Anything that needs real-world production (shoots, sets, crews, edits) we cover too. AI makes us faster. Years of doing it the hard way make us good.",
+  /** The disciplines in the studio, set small under the body. Optional: an empty list hides the line. */
+  disciplines: ["Filmmakers", "Cinematographers", "Designers", "Editors", "Strategists", "Creative directors"],
+} as const;
+
 /** [PARKED] Copy for HeroReel, which the hero no longer uses. */
 export const flagshipStage = {
   /** Caption over the flagship index, and the list's accessible name. */

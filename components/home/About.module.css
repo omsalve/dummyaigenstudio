@@ -1,0 +1,143 @@
+/*
+ * About
+ *
+ * Short and typographic on ivory, no cards. The label hangs in the first
+ * three columns like StringChapter's labels (a short rule, tracked caps); the
+ * statement, body and disciplines start at column 4, so the statement's left
+ * edge lines up with the industries chapter's cards further down.
+ */
+
+.about {
+  /* Tuning */
+  --about-pad: clamp(6rem, 18vh, 12rem);
+  --about-statement: clamp(2.5rem, 1.1rem + 4.6vw, 6.5rem);
+  /*
+   * Looser than the hero's: when the statement wraps, the script word's tall
+   * ascenders (about 1em above its baseline at --accent-scale) have to clear
+   * the line above.
+   */
+  --about-leading: 1.06;
+  --accent-scale: calc(var(--script-scale) * 0.88);
+
+  padding: var(--about-pad) var(--gutter);
+  background: var(--color-bg);
+  color: var(--color-fg);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  max-width: var(--container-max);
+  margin-inline: auto;
+}
+
+.eyebrow {
+  display: flex;
+  grid-column: 1 / span 3;
+  align-items: center;
+  align-self: start;
+  gap: 0.75rem;
+  margin: 0;
+  /* Centred on the statement's first line of capitals. */
+  padding-top: calc(var(--about-statement) * 0.46);
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rule {
+  flex: none;
+  width: 1.5rem;
+  height: 1px;
+  background: currentColor;
+}
+
+.statement {
+  grid-column: 4 / -1;
+  margin: 0;
+  font-size: var(--about-statement);
+  font-weight: 400;
+  line-height: var(--about-leading);
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+/* The script runs small beside Inter; scaled up to sit level, and its line box kept to the statement's. */
+.accent {
+  font-family: var(--font-accent);
+  font-size: calc(var(--accent-scale) * 1em);
+  line-height: calc(var(--about-leading) / var(--accent-scale));
+  letter-spacing: 0;
+}
+
+.body {
+  grid-column: 4 / span 5;
+  max-width: 40ch;
+  margin: clamp(2rem, 5vh, 3.25rem) 0 0;
+  color: var(--color-fg-muted);
+  font-size: clamp(1.0625rem, 0.96rem + 0.32vw, 1.3125rem);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+/* Inline items, so the list wraps like a sentence. */
+.disciplines {
+  grid-column: 4 / -1;
+  margin: clamp(2.5rem, 7vh, 4.5rem) 0 0;
+  padding: 0;
+  color: var(--color-fg-muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 2;
+  list-style: none;
+  text-transform: uppercase;
+}
+
+.disciplines li {
+  display: inline;
+}
+
+/* The dots are decoration: the "/ ''" alt text keeps them out of what's read. */
+.disciplines li + li::before {
+  content: "\00a0\00b7\0020";
+  content: "\00a0\00b7\0020" / "";
+}
+
+/* ---------- Tablets: the copy takes two more columns ---------- */
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .eyebrow {
+    grid-column: 1 / -1;
+    padding-top: 0;
+    margin-bottom: 2rem;
+  }
+
+  .statement,
+  .disciplines {
+    grid-column: 1 / -1;
+  }
+
+  .body {
+    grid-column: 1 / span 8;
+  }
+}
+
+/* ---------- Phones. Keep in sync with NARROW_QUERY ---------- */
+
+@media (max-width: 767.98px) {
+  .eyebrow,
+  .statement,
+  .body,
+  .disciplines {
+    grid-column: 1 / -1;
+  }
+
+  .eyebrow {
+    padding-top: 0;
+    margin-bottom: 1.75rem;
+  }
+}
