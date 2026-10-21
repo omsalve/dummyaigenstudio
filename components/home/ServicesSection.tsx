@@ -1,14 +1,15 @@
 import { brand } from "@/content/brand";
 import { massField } from "@/content/home";
 import { industries } from "@/content/industries";
-import { serviceCategories } from "@/content/services";
+import { serviceGroups, services } from "@/content/services";
 import { verticals } from "@/content/verticals";
 import { MassField, type MassFieldGroup, type MassFieldServiceGroup } from "./MassField";
 
-const services: MassFieldServiceGroup[] = serviceCategories.map((category) => ({
-  name: category.name,
-  items: category.services,
-  image: category.image,
+// Each practice, then its services by short name, in the services' own order.
+const serviceColumn: MassFieldServiceGroup[] = serviceGroups.map((group) => ({
+  name: group.name,
+  items: services.filter((service) => service.group === group.id).map((service) => service.shortName),
+  image: group.image.src,
 }));
 
 // Industries in the brief's vertical order, each with what LMR does for it.
@@ -27,7 +28,7 @@ export function ServicesSection() {
       frameLabel={brand.descriptor}
       cue={massField.cue}
       notes={massField.notes}
-      services={services}
+      services={serviceColumn}
       industries={industryGroups}
     />
   );
