@@ -8,3 +8,6 @@ export const CAROUSEL_QUERY = "(max-width: 767.98px), (hover: none) and (pointer
 
 /** Phone layouts: MassField unpins, StringChapter collapses to a top bar. */
 export const NARROW_QUERY = "(max-width: 767.98px)";
+
+/** Art direction: portrait and square screens (phones, upright tablets) get the 9:16 crops. */
+export const PORTRAIT_QUERY = "(max-aspect-ratio: 1/1)";

@@ -1,4 +1,7 @@
 /*
+ * [PARKED] Only HeroReel uses this, and the hero no longer uses HeroReel
+ * (homepage v2). Kept intact in case the reel comes back lower on the page.
+ *
  * FluidReel: the hero's film, drawn as liquid.
  *
  * A GPU fluid (stable fluids: advect, vorticity, pressure projection) runs
