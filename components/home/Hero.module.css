@@ -68,13 +68,12 @@
   white-space: nowrap;
 }
 
-/* Instrument Serif sits small beside Geist; the size step evens the x-heights. */
+/* The script runs small beside Inter; --script-scale evens the x-heights. */
 .accent {
   font-family: var(--font-accent);
-  font-size: 1.12em;
-  font-style: italic;
-  line-height: calc(var(--leading-display) / 1.12);
-  letter-spacing: -0.01em;
+  font-size: calc(var(--script-scale) * 1em);
+  line-height: calc(var(--leading-display) / var(--script-scale));
+  letter-spacing: 0;
 }
 
 .lockup {

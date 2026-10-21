@@ -24,9 +24,21 @@
   --color-on-media: var(--lmr-ivory);
 
   /* Type */
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  /* Accent italic: set with font-style: italic. */
-  --font-accent: var(--font-accent-italic), ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /*
+   * Script: Tempting, an upright copperplate. A word or two at a time, never
+   * a sentence, never in caps, and never with font-style: italic (the browser
+   * would fake an oblique on top of the script's own slant).
+   */
+  --font-accent: var(--font-script), ui-serif, Georgia, serif;
+  /*
+   * Script set among Inter is scaled by this so its x-height sits optically
+   * level with Inter's (about 90%: Inter's x-height is 0.546em). Pair it with
+   * line-height ÷ the same factor so the line box doesn't grow.
+   * [ASSET] Tuned to the stand-in, Pinyon Script (x-height 0.334em). Re-check
+   * it once Tempting is in: start from 0.49 ÷ Tempting's x-height.
+   */
+  --script-scale: 1.45;
   --text-label: 0.6875rem;
   --tracking-label: 0.22em;
   --weight-label: 500;
