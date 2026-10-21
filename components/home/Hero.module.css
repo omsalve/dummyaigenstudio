@@ -1,18 +1,33 @@
 /*
  * Hero
  *
- * Full-bleed and cinematic, as on the palette board's hero panels: the
- * flagship on show fills the frame (HeroReel), the statement is set over it
- * in ivory at the lower left like a title card, and the flagships run along
- * the bottom as chapters. The text block follows the board: statement,
- * lockup, a short rule, the action.
+ * Full-bleed, one surreal image built as a depth sandwich. Back to front: the
+ * background plate; "Reality", set huge in the script; then the subject, a
+ * cut-out registered to the plate, so it stands in front of the word like a
+ * model over a magazine masthead. A soft scrim at the lower left carries the
+ * copy, as on the palette board's hero panels: two lines, each a lead word in
+ * full white and the rest at half strength, then the lockup, a short rule and
+ * the action. HeroMotion.tsx adds scroll parallax and pointer drift; the
+ * load-in below is CSS, so it starts with the first paint.
  */
 
 .hero {
   /* Tuning */
   --hero-pad-top: clamp(5rem, 14svh, 9rem);
-  --hero-pad-bottom: clamp(1.25rem, 4svh, 2.5rem);
-  --hero-statement: clamp(2.75rem, 6.2vw, 7.25rem); /* each sentence holds one line of the 7-column measure */
+  --hero-pad-bottom: clamp(2rem, 7svh, 5rem);
+  --hero-line: clamp(2.25rem, 4.6vw, 5.75rem); /* each line holds one line of the 8-column measure from 1280px */
+  --hero-reality-size: clamp(8rem, 30vw, 34rem);
+  --hero-reality-color: #fff;
+  --hero-lead-color: #fff;
+  --hero-rest-color: color-mix(in srgb, #fff 50%, transparent);
+  /*
+   * Ink behind the lines: only as much as the half-white words need for AA
+   * large-text contrast (3:1) over the plate. Cobalt needs 24% at the words,
+   * a bright highlight up to 70%. [ASSET] Re-measure on the final plate.
+   */
+  --hero-scrim: 36%;
+  --hero-bleed: 1.5rem; /* plate overscan, so drift never shows an edge; keep it above the largest DRIFT in HeroMotion.tsx */
+  --hero-rise: 6vh; /* how far "Reality" rises on load */
   --hero-column: calc((var(--container-max) - (var(--grid-columns) - 1) * var(--grid-gap)) / var(--grid-columns));
 
   position: relative;
@@ -23,13 +38,13 @@
     [content-start] repeat(var(--grid-columns), minmax(0, var(--hero-column)))
     [content-end] minmax(calc(var(--gutter) - var(--grid-gap)), 1fr)
     [full-end];
-  grid-template-rows: 1fr auto;
+  grid-template-rows: 1fr;
   column-gap: var(--grid-gap);
   min-height: 100vh;
   min-height: 100svh;
   padding-block: var(--hero-pad-top) var(--hero-pad-bottom);
   overflow: clip;
-  color: var(--lmr-ivory);
+  color: #fff;
   background: var(--lmr-ink);
 }
 
@@ -38,42 +53,124 @@
   color: var(--lmr-ink);
 }
 
-.thought {
+/* ---------- The plate ---------- */
+
+.plate {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Background and subject share one box (and one crop), so they stay registered. */
+.layer {
+  position: absolute;
+  inset: calc(-1 * var(--hero-bleed));
+}
+
+.picture {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* getImageProps' fill styles size it; this crops it. */
+.image {
+  object-fit: cover;
+}
+
+.realityLayer {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+ * A hero-wide box centred on --reality-x/y, with the word centred inside it
+ * (flex centring holds even if the word overflows). No transform: that's
+ * HeroMotion's drift, and GSAP would fold a centring translate into it.
+ */
+.reality {
+  position: absolute;
+  top: var(--reality-y);
+  left: calc(var(--reality-x) - 50%);
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: -0.5em 0 0;
+  color: var(--hero-reality-color);
+  font-family: var(--font-accent);
+  font-size: var(--hero-reality-size);
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.realityWord {
+  display: inline-block;
+}
+
+/* Keep in sync with PORTRAIT_QUERY: the 9:16 crops are showing. */
+@media (max-aspect-ratio: 1/1) {
+  .reality {
+    top: var(--reality-y-portrait);
+    left: var(--reality-x-portrait);
+  }
+}
+
+/* ---------- Copy ---------- */
+
+.copy {
   position: relative;
   z-index: 1;
-  grid-column: content-start / span 7;
+  grid-column: content-start / span 8;
   grid-row: 1;
   align-self: end;
-  padding-bottom: clamp(2.5rem, 7svh, 5rem);
 }
 
-.chapters {
+.title {
   position: relative;
-  z-index: 1;
-  grid-column: content-start / content-end;
-  grid-row: 2;
-}
-
-.statement {
+  isolation: isolate;
   margin: 0;
-  font-size: var(--hero-statement);
+  font-size: var(--hero-line);
   font-weight: 400;
-  line-height: var(--leading-display);
+  line-height: 1.02;
   letter-spacing: var(--tracking-display);
   text-wrap: balance;
 }
 
-/* Hyphenated compounds ("Real-world") never break at the hyphen. */
-.compound {
-  white-space: nowrap;
+/*
+ * The scrim: a soft pool of ink centred on the lines and sized from the h1's
+ * own box, so it follows the text at every width and has faded out before the
+ * hero's bottom edge. The words all sit inside the first 60% of its radius,
+ * where it still holds at least 80% of --hero-scrim.
+ */
+.title::before {
+  content: "";
+  position: absolute;
+  inset: -100% -50%;
+  z-index: -1;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--lmr-ink) var(--hero-scrim), transparent) 0%,
+    color-mix(in srgb, var(--lmr-ink) var(--hero-scrim), transparent) 45%,
+    color-mix(in srgb, var(--lmr-ink) calc(var(--hero-scrim) * 0.8), transparent) 62%,
+    color-mix(in srgb, var(--lmr-ink) calc(var(--hero-scrim) * 0.45), transparent) 78%,
+    color-mix(in srgb, var(--lmr-ink) calc(var(--hero-scrim) * 0.15), transparent) 90%,
+    transparent
+  );
+  pointer-events: none;
 }
 
-/* The script runs small beside Inter; --script-scale evens the x-heights. */
-.accent {
-  font-family: var(--font-accent);
-  font-size: calc(var(--script-scale) * 1em);
-  line-height: calc(var(--leading-display) / var(--script-scale));
-  letter-spacing: 0;
+.line {
+  display: block;
+}
+
+.lead {
+  color: var(--hero-lead-color);
+}
+
+.rest {
+  color: var(--hero-rest-color);
 }
 
 .lockup {
@@ -122,8 +219,53 @@
   outline-offset: 3px;
 }
 
+/* ---------- Load-in: "Reality" rises behind the subject, then the lines, lead word first ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .realityWord {
+    animation: hero-reality-in 1.8s var(--ease-out) 0.15s both;
+  }
+
+  .line {
+    animation: hero-line-in 1.2s var(--ease-out) calc(0.75s + var(--line, 0) * 0.16s) both;
+  }
+
+  .lead {
+    animation: hero-fade-in 0.9s var(--ease-out) calc(0.75s + var(--line, 0) * 0.16s) both;
+  }
+
+  .rest {
+    animation: hero-fade-in 0.9s var(--ease-out) calc(0.9s + var(--line, 0) * 0.16s) both;
+  }
+
+  .after {
+    animation: hero-fade-in 1s var(--ease-out) 1.3s both;
+  }
+}
+
+@keyframes hero-reality-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--hero-rise));
+  }
+}
+
+@keyframes hero-line-in {
+  from {
+    transform: translateY(0.45em);
+  }
+}
+
+@keyframes hero-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------- Phones. Keep in sync with NARROW_QUERY ---------- */
+
 @media (max-width: 767.98px) {
-  .thought {
+  .copy {
     grid-column: content-start / content-end;
   }
 }

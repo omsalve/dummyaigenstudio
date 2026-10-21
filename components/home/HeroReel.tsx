@@ -1,5 +1,9 @@
 "use client";
 
+// [PARKED] The hero stopped using HeroReel (and fluidReel.ts) in homepage v2;
+// it's now a layered still (Hero.tsx). Kept intact: the reel may come back
+// lower on the page, fed by content/flagship.ts and flagshipStage.
+
 import { useEffect, useId, useRef, useState } from "react";
 import type { AnimationEvent, FocusEvent, PointerEvent as ReactPointerEvent } from "react";
 import Image from "next/image";

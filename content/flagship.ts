@@ -1,8 +1,9 @@
 import type { FlagshipProject } from "./types";
 
 /**
- * One flagship project per vertical. The hero orders them by
+ * One flagship project per vertical. HeroReel orders them by
  * content/verticals.ts, so the order here doesn't matter.
+ * [PARKED] HeroReel, the only thing that renders these, is parked.
  *
  * [CONTENT] Titles and links are placeholders; tags follow content/copy.json,
  * moved to the brief's palettes. The posters and clips in
