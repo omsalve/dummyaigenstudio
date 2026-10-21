@@ -6,10 +6,14 @@ import { verticals } from "@/content/verticals";
 import { MassField, type MassFieldGroup, type MassFieldServiceGroup } from "./MassField";
 
 // Each practice, then its services by short name, in the services' own order.
+// The frame crops the group's image to each shape unless a purpose-cut crop is given.
 const serviceColumn: MassFieldServiceGroup[] = serviceGroups.map((group) => ({
   name: group.name,
   items: services.filter((service) => service.group === group.id).map((service) => service.shortName),
-  image: group.image.src,
+  images: {
+    portrait: group.images?.portrait ?? group.image,
+    landscape: group.images?.landscape ?? group.image,
+  },
 }));
 
 // Industries in the brief's vertical order, each with what LMR does for it.

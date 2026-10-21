@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { CSSProperties, RefObject, SyntheticEvent } from "react";
+import type { CSSProperties, RefObject } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -18,7 +18,7 @@ const CURVE_PERIOD = 0.72;
 const CURVE_MAX_VW = 0.15;
 const CURVE_MAX_VW_NARROW = 0.06;
 /** Closest a swung word may come to the centre line, as a fraction of viewport width. */
-const CURVE_INNER_VW = 0.09;
+const CURVE_INNER_VW = 0.1;
 // Tuning: notes
 /** How far a note's lines fly in from and out to, as a fraction of viewport width. */
 const NOTE_TRAVEL_VW = 0.22;
@@ -29,18 +29,28 @@ const TYPE_STEP = 0.05;
 // Tuning: light
 /** Seconds the glow takes to catch up with the pointer. */
 const GLOW_LAG = 1.6;
-/** Frame shape until the active image reports its own. Keep in sync with --frame-ratio in the CSS. */
-const DEFAULT_RATIO = 4 / 5;
+// Tuning: the frame
+/**
+ * Shapes (width / height) the frame steps through as the lit service word
+ * changes; it morphs from one to the next. The first is also the static
+ * frame's shape: keep it in sync with --frame-ratio's initial value in the CSS.
+ */
+const RATIO_SEQUENCE = [9 / 16, 16 / 9] as const;
+/** "word": every newly lit service word steps the shape; "group": only a new group does. */
+const RATIO_STEP = "word" as "word" | "group";
 /**
  * When each note slot is shown, as ScrollTrigger [start, end]. Each window keeps
- * its slot ([data-slot] in the CSS) in a stretch the curve leaves clear: slot 0
- * sits top right, where the words have swung in; slots 1 and 2 sit between the
- * frame and the right column, near the hairline. Notes past the last slot reuse them.
+ * its slot ([data-slot] in the CSS) in a band the curve leaves clear: below the
+ * hairline the columns swing in toward the frame, freeing the outer margins
+ * (above it, the captions cut the band short; near it, the frame fills the
+ * middle). Slot 0 sits bottom right, where only a narrow note fits beside the
+ * long industries; slots 1 and 2 sit bottom left, at different points in the
+ * scroll. Notes past the last slot reuse them.
  */
 const NOTE_WINDOWS = [
-  ["top 26%", "bottom 2%"],
-  ["top 60%", "top 26%"],
-  ["top 60%", "top 26%"],
+  ["bottom bottom", "top 74%"],
+  ["bottom bottom", "top 72%"],
+  ["bottom bottom", "top 70%"],
 ] as const;
 /** The cue's pixel chevron, as [column, row] cells on a 5 × 3 grid. */
 const CHEVRON = [
@@ -58,8 +68,15 @@ export interface MassFieldGroup {
   items: readonly string[];
 }
 
+export interface MassFieldImage {
+  src: string;
+  /** CSS object-position: what stays in view when the frame crops it. */
+  focus?: string;
+}
+
 export interface MassFieldServiceGroup extends MassFieldGroup {
-  image: string;
+  /** Shown in the frame while the group's words are lit, one per frame shape (they may be the same image). */
+  images: { portrait: MassFieldImage; landscape: MassFieldImage };
 }
 
 export interface MassFieldNote {
@@ -189,7 +206,6 @@ export function MassField({
   const narrow = useMediaQuery(NARROW_QUERY);
   const mode: Mode = reducedMotion ? "static" : narrow ? "flow" : "pinned";
   const [active, setActive] = useState<Active>({ services: 0, industries: 0 });
-  const [ratios, setRatios] = useState<(number | undefined)[]>([]);
 
   const rootRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -203,19 +219,10 @@ export function MassField({
   // Reduced motion lights nothing: every word stays at full strength.
   const lit: Active = mode === "static" ? { services: -1, industries: -1 } : active;
   const activeImage = serviceGroupOf[Math.max(0, lit.services)] ?? 0;
-  const frameRatio = ratios[activeImage] ?? DEFAULT_RATIO;
-
-  function handleImageLoad(index: number, event: SyntheticEvent<HTMLImageElement>) {
-    const { naturalWidth, naturalHeight } = event.currentTarget;
-    if (!naturalWidth || !naturalHeight) return;
-    const ratio = naturalWidth / naturalHeight;
-    setRatios((current) => {
-      if (current[index] === ratio) return current;
-      const next = [...current];
-      next[index] = ratio;
-      return next;
-    });
-  }
+  // The frame's shape steps with the lit word (or its group); static keeps the first shape.
+  const step = Math.max(0, RATIO_STEP === "word" ? lit.services : (serviceGroupOf[lit.services] ?? 0));
+  const frameRatio = RATIO_SEQUENCE[step % RATIO_SEQUENCE.length];
+  const frameShape = frameRatio < 1 ? "portrait" : "landscape";
 
   useEffect(() => {
     const root = rootRef.current;
@@ -459,26 +466,36 @@ export function MassField({
       <h2 id="mass-field-title" className="sr-only">
         {title}
       </h2>
-      <div ref={stageRef} className={styles.stage}>
+      {/* --frame-ratio lives on the stage, so the tagline can follow the frame through the morph. */}
+      <div ref={stageRef} className={styles.stage} style={{ "--frame-ratio": frameRatio } as CSSProperties}>
         <div className={styles.backdrop} aria-hidden="true">
           <div ref={glowRef} className={styles.glow} />
         </div>
 
         <div className={styles.mass} aria-hidden="true">
           <span className={styles.hairline} />
-          <div className={styles.frame} style={{ "--frame-ratio": frameRatio } as CSSProperties}>
-            {services.map((group, index) => (
-              <Image
-                key={group.name}
-                className={styles.image}
-                src={group.image}
-                alt=""
-                fill
-                sizes="(max-width: 767.98px) 46vw, 15vw"
-                data-active={index === activeImage || undefined}
-                onLoad={(event) => handleImageLoad(index, event)}
-              />
-            ))}
+          <div className={styles.frame}>
+            {services.map((group, index) => {
+              const { portrait, landscape } = group.images;
+              // One image when both shapes share a crop: object-fit follows the morph.
+              const shared = portrait.src === landscape.src && portrait.focus === landscape.focus;
+              const crops = shared ? [{ shape: "any", ...portrait }] : [
+                { shape: "portrait", ...portrait },
+                { shape: "landscape", ...landscape },
+              ];
+              return crops.map((crop) => (
+                <Image
+                  key={`${group.name}-${crop.shape}`}
+                  className={styles.image}
+                  src={crop.src}
+                  alt=""
+                  fill
+                  sizes="(max-width: 767.98px) 88vw, 34vw"
+                  style={crop.focus ? { objectPosition: crop.focus } : undefined}
+                  data-active={(index === activeImage && (shared || crop.shape === frameShape)) || undefined}
+                />
+              ));
+            })}
           </div>
           <span className={styles.frameLabel}>{frameLabel}</span>
         </div>

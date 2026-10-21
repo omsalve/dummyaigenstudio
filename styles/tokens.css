@@ -47,6 +47,9 @@
   --tracking-display: -0.035em;
   --text-card-title: clamp(0.9375rem, 0.82rem + 0.3vw, 1.125rem);
 
+  /* Shape: one corner language for media across the page */
+  --radius-media: clamp(10px, 0.8vw, 16px);
+
   /* Layout */
   --container-max: 1680px;
   --gutter: clamp(1rem, 3.2vw, 3rem);

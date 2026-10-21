@@ -3,16 +3,19 @@ import type { Service, ServiceGroup } from "./types";
 /**
  * The three practices, in the order MassField's left column lists them. Each
  * one heads its own run of services (those below that name it as `group`).
+ * MassField's frame alternates between 9:16 and 16:9, cropping `image` to each
+ * around its `focus`; give `images.portrait` / `images.landscape` to supply
+ * purpose-cut crops instead.
  *
- * [ASSET] Frame images are generated stand-ins in /public/media/services.
+ * [ASSET] Frame images are the rendered flagship stand-ins (16:9 stills).
  */
 export const serviceGroups: readonly ServiceGroup[] = [
   // Moving image
-  { id: "light", name: "Light", image: { src: "/media/services/service-01.jpg" } },
+  { id: "light", name: "Light", image: { src: "/media/flagship/standin/flagship-01.jpg", focus: "55% 45%" } },
   // Things we make
-  { id: "matter", name: "Matter", image: { src: "/media/services/service-02.jpg" } },
+  { id: "matter", name: "Matter", image: { src: "/media/flagship/standin/flagship-04.jpg", focus: "52% 55%" } },
   // Things we build
-  { id: "reality", name: "Reality", image: { src: "/media/services/service-03.jpg" } },
+  { id: "reality", name: "Reality", image: { src: "/media/flagship/standin/flagship-02.jpg", focus: "57% 52%" } },
 ];
 
 /**
