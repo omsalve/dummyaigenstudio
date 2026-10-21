@@ -2,14 +2,14 @@ import type { Vertical } from "./types";
 
 /**
  * The four verticals, in the brief's order. Everything that lists verticals
- * (the hero's reel, StringChapter) follows this order.
+ * (MassField's right column, StringChapter) follows this order.
  *
- * [BRIEF] docs/lmr-brief.md was not in the repo, so names and order are
- * placeholders. Each id maps to a palette in styles/tokens.css.
+ * The brand brief fixes each vertical's palette (an id in styles/tokens.css).
+ * content/copy.json maps them differently; the brief wins.
  */
 export const verticals: readonly Vertical[] = [
-  { id: "solar", name: "Vertical 01" },
-  { id: "cobalt", name: "Vertical 02" },
-  { id: "citrus", name: "Vertical 03" },
-  { id: "coral", name: "Vertical 04" },
+  { id: "cobalt", name: "Real Estate" },
+  { id: "solar", name: "Interiors" },
+  { id: "coral", name: "Jewellery" },
+  { id: "citrus", name: "Pharma" },
 ];

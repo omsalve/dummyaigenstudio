@@ -1,9 +1,9 @@
 // Shared content types. Components render strings and media only from /content.
 
 /**
- * [BRIEF] Placeholder ids named after the palette board's four palettes.
- * Replace with the brief's vertical ids, and rename the matching
- * [data-vertical] blocks in styles/tokens.css.
+ * Palette ids: the palette board's four palettes. The brand brief fixes which
+ * vertical takes which (content/verticals.ts), and each id names a
+ * [data-vertical] block in styles/tokens.css.
  */
 export type VerticalId = "solar" | "cobalt" | "citrus" | "coral";
 
@@ -26,14 +26,49 @@ export interface FlagshipProject {
   href: string;
 }
 
-export interface ServiceCategory {
+/** An image, and the point to keep in view when it's cropped. */
+export interface FramedImage {
+  src: string;
+  /** CSS object-position, e.g. "50% 30%". Defaults to the centre. */
+  focus?: string;
+}
+
+/** The three practices: Light (moving image), Matter (things we make), Reality (things we build). */
+export type ServiceGroupId = "light" | "matter" | "reality";
+
+export interface ServiceGroup {
+  id: ServiceGroupId;
+  /** Heads the group's run of words in MassField's left column. */
   name: string;
-  services: readonly string[];
   /**
-   * Shown at the centre of MassField while this category's words pass the
-   * hairline. Any aspect ratio: the frame morphs to each image's own shape.
+   * Shown in MassField's frame while this group's words pass the hairline.
+   * The frame alternates between 9:16 and 16:9, so it's cropped to both.
    */
-  image: string;
+  image: FramedImage;
+  /** Purpose-cut crops for each frame shape. Either one falls back to `image`. */
+  images?: {
+    portrait?: FramedImage;
+    landscape?: FramedImage;
+  };
+}
+
+/** A still or a short muted loop. Loops need a poster: their first frame. */
+export type ServiceMedia =
+  | ({ kind: "image" } & FramedImage)
+  | ({ kind: "video"; poster: string } & FramedImage);
+
+export interface Service {
+  /** Full name, as the Services section sets it. */
+  name: string;
+  /** MassField's left column sets this in caps on one line, so keep it short. */
+  shortName: string;
+  /** One line under the name in the Services section. */
+  line: string;
+  group: ServiceGroupId;
+  /** Revealed beside the row on hover in the Services section. */
+  media?: ServiceMedia;
+  /** Rows don't link anywhere yet. */
+  href?: string;
 }
 
 export interface IndustryCard {

@@ -48,12 +48,13 @@
 
 /*
  * Vertical palettes, applied with data-vertical. Each vertical gets the
- * board's five swatches: accent, deep, paper, sand, stone.
- * [BRIEF] The ids are placeholders named after the board's palettes; rename
- * them to the brief's vertical ids (content/verticals.ts) when it lands.
+ * board's five swatches: accent, deep, paper, sand, stone. The ids are the
+ * board's palette names; the brand brief assigns them to verticals
+ * (content/verticals.ts): cobalt Real Estate, solar Interiors, coral
+ * Jewellery, citrus Pharma.
  */
 [data-vertical="solar"] {
-  --v-accent: #ff4d00;
+  --v-accent: #ff4d12;
   --v-deep: #1a1a1a;
   --v-paper: #f7f5f0;
   --v-sand: #d9c9b8;
