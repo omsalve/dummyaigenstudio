@@ -6,15 +6,17 @@
  * out to the screen edge at the hairline and in toward the image above and
  * below it, so the columns read as a "(" and a ")" around the frame. The word
  * on the hairline lights up and turns into its bracketed form; the frame shows
- * that service's category and takes the image's shape. Notes drift past at page
- * speed over the pinned stage. Phones and reduced motion use the flow layout
- * at the bottom: image on top, columns under it.
+ * that service's group and morphs between 9:16 and 16:9 each time the lit word
+ * changes. Notes drift past at page speed over the pinned stage. Phones and
+ * reduced motion use the flow layout at the bottom: image on top, columns
+ * under it.
  */
 
+/* Set on the stage and inherited, so the tagline rides the frame's edge through the morph. */
 @property --frame-ratio {
   syntax: "<number>";
-  inherits: false;
-  initial-value: 0.8; /* keep in sync with DEFAULT_RATIO in MassField.tsx */
+  inherits: true;
+  initial-value: 0.5625; /* keep in sync with RATIO_SEQUENCE[0] in MassField.tsx */
 }
 
 .root {
@@ -31,8 +33,8 @@
   --field-pitch: calc(var(--field-word) * var(--field-leading));
   --field-margin: 5.5vw; /* screen edge → each column's outer edge */
   --field-scroll: 2.2; /* page px scrolled per px the columns rise */
-  --frame-max-w: 15vw; /* the frame fits each image inside this box */
-  --frame-max-h: 30vh;
+  --frame-portrait-h: min(52vh, 40vw); /* the 9:16 frame's height */
+  --frame-landscape-w: min(27vw, 88vh); /* the 16:9 frame's width; wider meets the long industries near the hairline */
   --field-swap: 520ms; /* a word turning into its bracketed form */
   --field-crossfade: 700ms;
   --field-morph: 900ms; /* the frame changing shape */
@@ -52,11 +54,24 @@
 }
 
 .stage {
+  /*
+   * The frame's size at any ratio. Its long side eases from the portrait
+   * height (at 9:16) to the landscape width (at 16:9), and its area holds
+   * steady through the morph (width ∝ √ratio, height ∝ 1/√ratio), so no
+   * in-between shape is wider than the landscape frame or taller than the
+   * portrait one. 0.75 is √(9/16); 1.2153 is 16/9 − 9/16.
+   */
+  --frame-t: clamp(0, (var(--frame-ratio) - 0.5625) / 1.2153, 1);
+  --frame-long: calc(var(--frame-portrait-h) + (var(--frame-landscape-w) - var(--frame-portrait-h)) * var(--frame-t));
+  --frame-w: calc(var(--frame-long) * 0.75 * sqrt(var(--frame-ratio)));
+  --frame-h: calc(var(--frame-long) * 0.75 / sqrt(var(--frame-ratio)));
+
   position: sticky;
   top: 0;
   height: 100vh;
   height: 100svh;
   overflow: hidden;
+  transition: --frame-ratio var(--field-morph) var(--ease-in-out);
 }
 
 /* ---------- Light and grain ---------- */
@@ -115,18 +130,18 @@
   background: var(--field-rule);
 }
 
+/* isolation: Safari otherwise lets the crossfading images escape the rounded corners. */
 .frame {
-  --frame-w: min(var(--frame-max-w), var(--frame-max-h) * var(--frame-ratio));
-
   position: absolute;
   top: 50%;
   left: 50%;
+  isolation: isolate;
   width: var(--frame-w);
-  height: calc(var(--frame-w) / var(--frame-ratio));
+  height: var(--frame-h);
   overflow: hidden;
+  border-radius: var(--radius-media);
   background: color-mix(in srgb, var(--field-fg) 8%, transparent);
   transform: translate(-50%, -50%);
-  transition: --frame-ratio var(--field-morph) var(--ease-in-out);
 }
 
 .image {
@@ -167,9 +182,10 @@
   content: " )" / "";
 }
 
+/* Rides the frame's top edge, whichever shape it's in or between. */
 .tagline {
   position: absolute;
-  bottom: calc(50% + var(--frame-max-h) / 2 + clamp(1rem, 4.5vh, 2.75rem));
+  bottom: calc(50% + var(--frame-h) / 2 + clamp(1rem, 4.5vh, 2.75rem));
   left: 50%;
   z-index: 3;
   margin: 0;
@@ -183,9 +199,10 @@
   transform: translateX(-50%);
 }
 
+/* Low enough that the words passing beside them have swung well in (the curve peaks further down). */
 .caption {
   position: absolute;
-  top: clamp(1.25rem, 4.5vh, 2.75rem);
+  top: clamp(1.75rem, 6.5vh, 3.5rem);
   z-index: 3;
   margin: 0;
   color: var(--field-muted);
@@ -416,10 +433,12 @@
   pointer-events: none;
 }
 
+/* Narrow enough to fit the margin the swung-in words leave; longer lines wrap. */
 .note {
   position: absolute;
   display: grid;
   gap: 0.5em;
+  max-width: 10em;
   margin: 0;
   color: var(--field-muted);
   font-size: 0.8125rem;
@@ -432,13 +451,13 @@
 .note[data-slot="0"] {
   top: 17%;
   right: calc(var(--field-margin) + 1vw);
-  justify-items: center;
-  text-align: center;
+  justify-items: end;
+  text-align: right;
 }
 
 .note[data-slot="1"],
 .note[data-slot="2"] {
-  left: calc(50% + var(--frame-max-w) / 2 + 2.5vw);
+  left: clamp(1rem, 1.6vw, 2rem);
 }
 
 .note[data-slot="1"] {
@@ -451,7 +470,6 @@
 
 .noteLine {
   display: block;
-  white-space: nowrap;
 }
 
 .caret {
@@ -481,8 +499,8 @@
 /* Phones, and reduced motion at any width. Keep the first query in sync with NARROW_QUERY. */
 @media (max-width: 767.98px), (prefers-reduced-motion: reduce) {
   .root {
-    --frame-max-w: 26vw;
-    --frame-max-h: 42vh;
+    --frame-portrait-h: min(56vh, 44vw);
+    --frame-landscape-w: 60vw;
 
     height: auto;
   }
@@ -507,12 +525,13 @@
     transform: none;
   }
 
+  /* As tall as the portrait frame, so the shape can change without moving anything. */
   .mass {
     position: relative;
     inset: auto;
     grid-column: 1 / -1;
     grid-row: 2;
-    height: var(--frame-max-h);
+    height: var(--frame-portrait-h);
     margin-bottom: clamp(2.5rem, 6vh, 4rem);
   }
 
@@ -578,8 +597,8 @@
 @media (max-width: 767.98px) {
   .root {
     --field-word: clamp(0.8125rem, 3.4vw, 1.125rem);
-    --frame-max-w: 46vw;
-    --frame-max-h: 58vw;
+    --frame-portrait-h: min(100vw, 62svh);
+    --frame-landscape-w: 88vw;
   }
 
   /*
@@ -594,7 +613,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .frame,
+  .stage,
   .image,
   .word,
   .wordText,
