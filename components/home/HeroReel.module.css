@@ -192,15 +192,14 @@
   align-items: baseline;
   gap: 0.875rem;
   font-family: var(--font-accent);
-  font-size: clamp(0.9375rem, 0.85rem + 0.25vw, 1.125rem);
-  font-style: italic;
+  font-size: calc(var(--script-scale) * clamp(0.9375rem, 0.85rem + 0.25vw, 1.125rem));
   line-height: 1;
   white-space: nowrap;
 }
 
 .tag {
   font-family: var(--font-sans);
-  font-style: normal;
+  font-size: calc(1em / var(--script-scale));
   opacity: 0.8;
 }
 

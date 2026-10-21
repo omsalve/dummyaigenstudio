@@ -254,13 +254,15 @@
   display: inline-block;
 }
 
-/* The bracketed form: same words, in the accent italic, anchored to the column's outer edge. */
+/* The bracketed form: same words, in the script, anchored to the column's outer edge. */
 .wordAlt {
+  /* Tuning: the script's x-height level with the words', plus a little emphasis. */
+  --alt-scale: calc(var(--script-scale) * 1.09);
+
   position: absolute;
   top: 50%;
   font-family: var(--font-accent);
-  font-size: 1.22em;
-  font-style: italic;
+  font-size: calc(var(--alt-scale) * 1em);
   letter-spacing: 0;
   line-height: 1;
   text-transform: none;
@@ -270,12 +272,19 @@
   pointer-events: none;
 }
 
+/* Brackets in Inter, at the word's own size. */
 .wordAlt::before,
 .wordAlt::after {
   font-family: var(--font-sans);
-  font-size: 0.82em;
-  font-style: normal;
+  font-size: calc(1em / var(--alt-scale));
   font-weight: 300;
+}
+
+/* All-caps words keep Inter: the script is never set in caps. */
+.wordAlt[data-caps] {
+  --alt-scale: 1;
+
+  font-family: var(--font-sans);
 }
 
 .wordAlt::before {
@@ -573,8 +582,14 @@
     --frame-max-h: 58vw;
   }
 
+  /*
+   * The script's hairlines break up below about 22px, and here the bracketed
+   * form would set at about 19px, so phones keep it in Inter.
+   */
   .wordAlt {
-    font-size: 1.12em;
+    --alt-scale: 1.12;
+
+    font-family: var(--font-sans);
   }
 }
 

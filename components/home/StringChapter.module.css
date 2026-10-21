@@ -136,8 +136,7 @@
 
 .stopName {
   font-family: var(--font-accent);
-  font-size: 1.125rem;
-  font-style: italic;
+  font-size: calc(var(--script-scale) * 1rem);
   line-height: 1;
   white-space: nowrap;
 }
@@ -182,7 +181,6 @@
 .numeral {
   font-family: var(--font-accent);
   font-size: clamp(4.5rem, 2.5rem + 4vw, 7.5rem);
-  font-style: italic;
   letter-spacing: -0.02em;
   line-height: 0.85;
 }

@@ -116,12 +116,14 @@ function countWords(groups: readonly MassFieldGroup[]) {
 
 /** A word as listed, and the bracketed form it turns into on the hairline (or under the pointer). */
 function WordFace({ label }: { label: string }) {
+  // The script never sets caps, so an all-caps word (an acronym like "AI VFX") keeps Inter.
+  const caps = label === label.toUpperCase();
   return (
     <>
       <span className={styles.wordText} data-word-text>
         {label}
       </span>
-      <span className={styles.wordAlt} aria-hidden="true">
+      <span className={styles.wordAlt} data-caps={caps || undefined} aria-hidden="true">
         {label}
       </span>
     </>

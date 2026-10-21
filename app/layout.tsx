@@ -1,23 +1,32 @@
 import type { Metadata } from "next";
-import { Geist, Instrument_Serif } from "next/font/google";
+import { Inter, Pinyon_Script } from "next/font/google";
+// import localFont from "next/font/local";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { brand } from "@/content/brand";
 import { hero } from "@/content/home";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// With the optical-size axis, display sizes get Inter's tighter Display cut on their own.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  axes: ["opsz"],
 });
 
-// [SCAFFOLD] Provisional accent italic until the scaffold's typeface is wired in.
-const accentItalic = Instrument_Serif({
-  variable: "--font-accent-italic",
+// The script: Tempting (RGB Studio), an upright copperplate for a word or two at a time.
+// [ASSET] Tempting-Regular.woff2 isn't in the repo yet, so Pinyon Script stands in.
+// Once it's in app/fonts/, swap the stand-in for the loader below, drop the
+// Pinyon_Script import, and re-check --script-scale in styles/tokens.css.
+const script = Pinyon_Script({
+  variable: "--font-script",
   weight: "400",
-  style: "italic",
   subsets: ["latin"],
 });
+// const script = localFont({
+//   src: "./fonts/Tempting-Regular.woff2",
+//   variable: "--font-script",
+// });
 
 export const metadata: Metadata = {
   title: `${brand.name} — ${brand.descriptor}`,
@@ -26,7 +35,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${accentItalic.variable} antialiased`}>
+    <html lang="en" className={`${inter.variable} ${script.variable} antialiased`}>
       <body>
         <SmoothScroll />
         {children}
