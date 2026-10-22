@@ -71,6 +71,16 @@ export interface Service {
   href?: string;
 }
 
+export interface Platform {
+  name: string;
+  /**
+   * The company's official wordmark, an SVG from its press kit, shown in
+   * place of the name (which becomes its alt text). Width and height are the
+   * file's intrinsic size; the row sets it to the text's height.
+   */
+  logo?: { src: string; width: number; height: number };
+}
+
 export interface IndustryCard {
   title: string;
   summary: string;

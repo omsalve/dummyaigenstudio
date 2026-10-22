@@ -75,6 +75,15 @@ export const consultation = {
   href: "#",
 } as const;
 
+/** The "Platforms we use" row. The platforms themselves live in content/platforms.ts. */
+export const platformsRow = {
+  title: "Platforms we use",
+  /** Closes the row, on its own line. */
+  coda: "+ the right human minds",
+  /** Set in the script: the punchline, verbatim from the coda. */
+  codaAccent: "human minds",
+} as const;
+
 /** [PARKED] Copy for HeroReel, which the hero no longer uses. */
 export const flagshipStage = {
   /** Caption over the flagship index, and the list's accessible name. */

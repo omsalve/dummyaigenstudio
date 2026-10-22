@@ -1,0 +1,124 @@
+/*
+ * Platforms
+ *
+ * One row of wordmarks, set like a credit line: names in Inter at a
+ * mid-display size, dotted apart, wrapping naturally. The closing line drops
+ * to its own row, "+ the right" in the muted ink and the punchline in the
+ * script, a step larger so it lands. Static by design.
+ */
+
+.platforms {
+  /* Tuning */
+  --platforms-pad: clamp(5rem, 14vh, 9rem);
+  --platform-size: clamp(1.375rem, 0.8rem + 1.6vw, 2.625rem);
+  --platform-leading: 1.25;
+  /* The script among Inter, a touch over x-height level so the punchline lands. */
+  --coda-accent-scale: calc(var(--script-scale) * 1.05);
+
+  padding: var(--platforms-pad) var(--gutter);
+  background: var(--color-bg);
+  color: var(--color-fg);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  max-width: var(--container-max);
+  margin-inline: auto;
+}
+
+/* The section heading, set as a label (as About's is). */
+.label {
+  display: flex;
+  grid-column: 1 / span 3;
+  align-items: center;
+  align-self: start;
+  gap: 0.75rem;
+  margin: 0;
+  /* Centred on the first row of names. */
+  padding-top: calc(var(--platform-size) * var(--platform-leading) / 2 - 0.5em);
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rule {
+  flex: none;
+  width: 1.5rem;
+  height: 1px;
+  background: currentColor;
+}
+
+.row {
+  grid-column: 4 / -1;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.platform {
+  font-size: var(--platform-size);
+  font-weight: 500;
+  line-height: var(--platform-leading);
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+
+/*
+ * Each name but the last carries the dot after it, so a wrap never starts a
+ * line on a dot. They're decoration: the "/ ''" alt text keeps them unread.
+ */
+.platform:not(:last-child)::after {
+  content: "\00b7";
+  content: "\00b7" / "";
+  margin-inline: 0.42em;
+  color: var(--color-fg-muted);
+  font-weight: 400;
+}
+
+/* An official wordmark sits at the names' cap height. */
+.logo {
+  width: auto;
+  height: 0.78em;
+  vertical-align: -0.04em;
+}
+
+/* The space above clears the script's tall ascenders off the names' descenders. */
+.coda {
+  margin: 0.35em 0 0;
+  color: var(--color-fg-muted);
+  font-size: var(--platform-size);
+  font-weight: 400;
+  line-height: var(--platform-leading);
+  letter-spacing: -0.02em;
+}
+
+.accent {
+  color: var(--color-fg);
+  font-family: var(--font-accent);
+  font-size: calc(var(--coda-accent-scale) * 1em);
+  line-height: calc(var(--platform-leading) / var(--coda-accent-scale));
+  letter-spacing: 0;
+}
+
+/* ---------- Tablets and phones: the label sits over the row. NARROW_QUERY is the lower half. ---------- */
+
+@media (max-width: 1023.98px) {
+  .label,
+  .row {
+    grid-column: 1 / -1;
+  }
+
+  .label {
+    padding-top: 0;
+    margin-bottom: 1.5rem;
+  }
+}
