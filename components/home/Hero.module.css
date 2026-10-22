@@ -44,7 +44,7 @@
   min-height: 100svh;
   padding-block: var(--hero-pad-top) var(--hero-pad-bottom);
   overflow: clip;
-  color: #fff;
+  color: var(--hero-lead-color);
   background: var(--lmr-ink);
 }
 

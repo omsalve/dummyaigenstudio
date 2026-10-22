@@ -7,10 +7,13 @@ import { Platforms } from "@/components/home/Platforms";
 import { Services } from "@/components/home/Services";
 import { ServicesSection } from "@/components/home/ServicesSection";
 
-// Order: Hero/HeroReel → Positioning → MassField (services) →
-// StringChapter (industries) → Engagements → Contact CTA.
-// [SCAFFOLD] Positioning, Engagements and Contact CTA weren't in this repo;
-// their slots are marked below. There was no triptych slot to remove.
+// Order: Hero → MassField (ServicesSection: services and industries as one
+// field) → About → Services (the index, closing on the consultation tile) →
+// StringChapter (IndustriesSection, #work) → Platforms → From the Lab →
+// Discretion (#discretion) → Contact CTA.
+// Dark first (Hero, MassField), light from About on, edge to edge with no
+// gradients between sections.
+// [SCAFFOLD] The Contact CTA wasn't in this repo; its slot is marked below.
 export default function Home() {
   return (
     <main>
@@ -22,7 +25,6 @@ export default function Home() {
       <Platforms />
       <Lab />
       <Discretion />
-      {/* [SCAFFOLD] Engagements */}
       {/* [SCAFFOLD] Contact CTA */}
     </main>
   );
