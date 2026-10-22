@@ -115,4 +115,6 @@ export const stringChapter = {
   navLabel: "Industries",
   /** Word between the current numeral and the total, set as "OF 04". */
   countJoiner: "of",
+  /** Small link under the last card, to the note on why the work is unbranded. */
+  coda: { label: "Why is this work unbranded?", href: "#discretion" },
 } as const;
