@@ -33,8 +33,14 @@
   --field-pitch: calc(var(--field-word) * var(--field-leading));
   --field-margin: 5.5vw; /* screen edge → each column's outer edge */
   --field-scroll: 2.2; /* page px scrolled per px the columns rise */
-  --frame-portrait-h: min(52vh, 40vw); /* the 9:16 frame's height */
-  --frame-landscape-w: min(27vw, 88vh); /* the 16:9 frame's width; wider meets the long industries near the hairline */
+  /*
+   * The 9:16 frame's height, and the 16:9 frame's width. The vw caps keep the
+   * frame clear of the words on squarer screens (4:3 tablets): the portrait
+   * frame never passes about 19vw wide, and the landscape one keeps a px of
+   * clearance from the lit industry's script form as the screen narrows.
+   */
+  --frame-portrait-h: min(52vh, 34vw);
+  --frame-landscape-w: min(27vw, 29vw - 1.5rem, 88vh);
   --field-swap: 520ms; /* a word turning into its bracketed form */
   --field-crossfade: 700ms;
   --field-morph: 900ms; /* the frame changing shape */
@@ -487,10 +493,34 @@
   }
 }
 
-/* Below this the gaps the notes sit in close up. */
+/*
+ * Under 1400px the widest industry ("Walkthrough films") leaves the right
+ * column so little swing that its words brush the Industries caption as they
+ * leave the top. Slightly smaller words give the curve back its room.
+ */
+@media (max-width: 1399.98px) {
+  .root {
+    --field-word: clamp(1.125rem, min(2.3vw, 4.5vh), 4rem);
+  }
+}
+
+@media (max-width: 1199.98px) {
+  .root {
+    --field-word: clamp(1.125rem, min(2.1vw, 4.5vh), 4rem);
+  }
+}
+
+/* Below this the gaps the notes sit in close up, and the tagline (a fixed-size label) breaks in two to keep clear of the words. */
 @media (max-width: 1099.98px) {
   .notes {
     display: none;
+  }
+
+  .tagline {
+    max-width: 20vw;
+    text-align: center;
+    text-wrap: balance;
+    white-space: normal;
   }
 }
 

@@ -113,7 +113,7 @@
 @media (max-aspect-ratio: 1/1) {
   .reality {
     top: var(--reality-y-portrait);
-    left: var(--reality-x-portrait);
+    left: calc(var(--reality-x-portrait) - 50%);
   }
 }
 
