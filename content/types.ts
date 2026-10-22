@@ -71,6 +71,28 @@ export interface Service {
   href?: string;
 }
 
+/** What a Lab post gives away. */
+export type LabKind = "Free prompt pack" | "Template" | "Workflow";
+
+export interface LabPost {
+  /** The post's address: /lab/[slug]. */
+  slug: string;
+  title: string;
+  kind: LabKind;
+  /** One or two sentences: the card's summary and the article's standfirst. */
+  excerpt: string;
+  /** Cropped to 4:3 on cards and 16:9 on the article. */
+  cover: string;
+  /** The word people comment on the Instagram reel to get the product by DM. */
+  keyword: string;
+  /** The reel the keyword is commented on. */
+  reelUrl: string;
+  /** Publication date, YYYY-MM-DD. Orders the posts, newest first. */
+  date: string;
+  /** The write-up, one paragraph per entry. Until it's written, the article is its standfirst and the call to comment. */
+  body?: readonly string[];
+}
+
 export interface Platform {
   name: string;
   /**

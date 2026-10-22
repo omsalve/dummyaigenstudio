@@ -1,0 +1,147 @@
+/*
+ * Lab
+ *
+ * The heading set at a step under Services', its line beside it and the link
+ * to the full index at the right, all resting on one baseline. Below, the
+ * latest posts run three across (LabCard), separated by the grid gap alone.
+ */
+
+.lab {
+  /* Tuning */
+  --lab-pad: clamp(5rem, 14vh, 10rem);
+  --lab-heading: clamp(2.5rem, 1.3rem + 4vw, 5.75rem);
+
+  padding: var(--lab-pad) var(--gutter);
+  background: var(--color-bg);
+  color: var(--color-fg);
+}
+
+.inner {
+  max-width: var(--container-max);
+  margin-inline: auto;
+}
+
+.head {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  align-items: end;
+}
+
+.title {
+  grid-column: 1 / span 6;
+  margin: 0;
+  font-size: var(--lab-heading);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: var(--tracking-display);
+}
+
+.intro {
+  grid-column: 7 / span 3;
+  max-width: 30ch;
+  margin: 0;
+  padding-bottom: calc(var(--lab-heading) * 0.06);
+  color: var(--color-fg-muted);
+  font-size: clamp(1rem, 0.94rem + 0.25vw, 1.1875rem);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.all {
+  display: inline-flex;
+  grid-column: 10 / -1;
+  align-items: center;
+  justify-self: end;
+  gap: 0.75rem;
+  padding-block: 0.625rem;
+  color: inherit;
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1.2;
+  text-decoration: none;
+  text-transform: uppercase;
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 calc(100% - 0.25rem) / 0 1px;
+  transition: background-size 450ms var(--ease-out);
+}
+
+.all svg {
+  flex: none;
+  transition: transform 450ms var(--ease-out);
+}
+
+.all:hover {
+  background-size: calc(100% - 18px - 0.75rem) 1px;
+}
+
+.all:hover svg {
+  transform: translateX(0.3rem);
+}
+
+.all:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 3px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(2.5rem, 6vh, 4rem) calc(var(--grid-gap) * 2);
+  margin: clamp(3rem, 8vh, 5rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---------- Tablets: two across, the heading's parts stacked ---------- */
+
+@media (min-width: 768px) and (max-width: 1099.98px) {
+  .title {
+    grid-column: 1 / -1;
+  }
+
+  .intro {
+    grid-column: 1 / span 7;
+    margin-top: 1.25rem;
+    padding-bottom: 0;
+  }
+
+  .all {
+    grid-column: 8 / -1;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Phones. Keep in sync with NARROW_QUERY ---------- */
+
+@media (max-width: 767.98px) {
+  .title,
+  .intro,
+  .all {
+    grid-column: 1 / -1;
+  }
+
+  .intro {
+    margin-top: 1rem;
+    padding-bottom: 0;
+  }
+
+  .all {
+    justify-self: start;
+    margin-top: 1rem;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .all,
+  .all svg {
+    transition: none;
+  }
+}
