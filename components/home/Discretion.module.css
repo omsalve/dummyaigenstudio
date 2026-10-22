@@ -1,0 +1,59 @@
+/*
+ * Discretion
+ *
+ * A note, not a section that sells: a single centred column narrow enough to
+ * read in one breath, a lot of air around it, nothing in colour.
+ */
+
+.discretion {
+  /* Tuning */
+  --discretion-pad: clamp(6rem, 20vh, 13rem);
+  --discretion-measure: 38rem;
+
+  padding: var(--discretion-pad) var(--gutter);
+  background: var(--color-bg);
+  color: var(--color-fg);
+  text-align: center;
+}
+
+.column {
+  max-width: var(--discretion-measure);
+  margin-inline: auto;
+}
+
+/* The site's short rule, stood above the label since the column is centred. */
+.eyebrow {
+  margin: 0;
+  color: var(--color-fg);
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: "";
+  display: block;
+  width: 1.5rem;
+  height: 1px;
+  margin: 0 auto 1.5rem;
+  background: currentColor;
+}
+
+.headline {
+  margin: 1.5rem 0 0;
+  font-size: clamp(2rem, 1.25rem + 2.9vw, 3.75rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.body {
+  margin: 1.75rem 0 0;
+  color: var(--color-fg-muted);
+  font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.25rem);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
