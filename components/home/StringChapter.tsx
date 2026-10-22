@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { AnchorLink } from "@/components/motion/AnchorLink";
 import { getLenis } from "@/components/motion/SmoothScroll";
 import type { ProjectTag, VerticalId } from "@/content/types";
 import { NARROW_QUERY, REDUCED_MOTION_QUERY } from "@/lib/media-queries";
@@ -34,6 +35,24 @@ const STOP_SCROLL_DURATION = 1.4;
 // Tuning: card stack
 /** Scale a card settles to once the next card has stacked over it. */
 const STACK_SCALE = 0.94;
+/**
+ * Cards under the top card that stay glass. Deeper ones switch to a solid
+ * fill: three cards cover them, and backdrop-filter is the costly part.
+ */
+const GLASS_DEPTH = 2;
+
+/** Fine pointers get the glint that follows the pointer across a card. */
+const GLINT_QUERY = "(hover: hover) and (pointer: fine)";
+
+/**
+ * Chromium alone can run an SVG filter inside backdrop-filter (the liquid
+ * refraction); Safari drops the whole declaration on sight, which is why this
+ * is a check rather than @supports.
+ */
+function isChromium() {
+  const brands = (navigator as Navigator & { userAgentData?: { brands: { brand: string }[] } }).userAgentData?.brands;
+  return Boolean(brands?.some(({ brand }) => brand === "Chromium"));
+}
 
 type Mode = "full" | "narrow" | "static";
 
@@ -63,6 +82,8 @@ interface StringChapterProps {
   /** Word in "OF 04". */
   countJoiner: string;
   verticals: readonly StringChapterVertical[];
+  /** Small link under the last card. */
+  coda?: { label: string; href: `#${string}` };
 }
 
 function pad(value: number) {
@@ -96,7 +117,7 @@ function ChapterIntro({ number, count, name, headline, description, nameAs: Name
   );
 }
 
-export function StringChapter({ id, title, navLabel, countJoiner, verticals }: StringChapterProps) {
+export function StringChapter({ id, title, navLabel, countJoiner, verticals, coda }: StringChapterProps) {
   const reducedMotion = useMediaQuery(REDUCED_MOTION_QUERY);
   const narrow = useMediaQuery(NARROW_QUERY);
   const mode: Mode = reducedMotion ? "static" : narrow ? "narrow" : "full";
@@ -156,6 +177,7 @@ export function StringChapter({ id, title, navLabel, countJoiner, verticals }: S
     let drawnY = NaN;
     let reported = -1;
     let running = false;
+    let lastTop = -1;
 
     const stopX = (index: number) => ((index + 0.5) / total) * width;
 
@@ -223,6 +245,17 @@ export function StringChapter({ id, title, navLabel, countJoiner, verticals }: S
           cards[i].style.transform = `scale(${scale.toFixed(4)})`;
           lastScale[i] = scale;
         }
+      }
+      // The top card is the last to have come into view; cards deeper than GLASS_DEPTH under it go
+      // solid, and only the top card (the one fully seen) refracts.
+      let top = 0;
+      while (top < cards.length - 1 && scrollY >= cardTops[top + 1] - viewport) top++;
+      if (top !== lastTop) {
+        cards.forEach((card, i) => {
+          card.toggleAttribute("data-solid", i < top - GLASS_DEPTH);
+          card.toggleAttribute("data-top", i === top);
+        });
+        lastTop = top;
       }
     };
 
@@ -312,9 +345,32 @@ export function StringChapter({ id, title, navLabel, countJoiner, verticals }: S
       cancelAnimationFrame(frameId);
       stopTicker();
       trigger.kill();
-      for (const card of cards) card.style.removeProperty("transform");
+      for (const card of cards) {
+        card.style.removeProperty("transform");
+        card.removeAttribute("data-solid");
+        card.removeAttribute("data-top");
+      }
     };
   }, [mode, total]);
+
+  // The glass: Chromium gets the liquid refraction, and fine pointers a glint that follows them.
+  useEffect(() => {
+    const root = rootRef.current;
+    const cardsColumn = cardsRef.current;
+    if (!root || !cardsColumn) return;
+    root.toggleAttribute("data-refract", isChromium());
+    if (mode === "static" || !window.matchMedia(GLINT_QUERY).matches) return;
+
+    const handleMove = (event: PointerEvent) => {
+      const card = (event.target as Element).closest<HTMLElement>("[data-card]");
+      if (!card) return;
+      const box = card.getBoundingClientRect();
+      card.style.setProperty("--glint-x", `${(event.clientX - box.left).toFixed(1)}px`);
+      card.style.setProperty("--glint-y", `${(event.clientY - box.top).toFixed(1)}px`);
+    };
+    cardsColumn.addEventListener("pointermove", handleMove);
+    return () => cardsColumn.removeEventListener("pointermove", handleMove);
+  }, [mode]);
 
   function handleStopClick(event: MouseEvent<HTMLAnchorElement>, index: number) {
     const header = headerRefs.current[index];
@@ -338,6 +394,17 @@ export function StringChapter({ id, title, navLabel, countJoiner, verticals }: S
       <h2 id="string-chapter-title" className="sr-only">
         {title}
       </h2>
+      {/*
+        The liquid refraction, used through backdrop-filter in Chromium ([data-refract]):
+        a slow, low-frequency warp, smoothed, that bends what's behind the glass.
+      */}
+      <svg className={styles.filters} aria-hidden="true" focusable="false">
+        <filter id="lmr-liquid" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+          <feTurbulence type="fractalNoise" baseFrequency="0.006 0.009" numOctaves="2" seed="7" result="noise" />
+          <feGaussianBlur in="noise" stdDeviation="3" result="swell" />
+          <feDisplacementMap in="SourceGraphic" in2="swell" scale="42" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </svg>
 
       <div ref={headRef} className={styles.head}>
         <div className={styles.headGrid}>
@@ -390,6 +457,23 @@ export function StringChapter({ id, title, navLabel, countJoiner, verticals }: S
         </div>
 
         <div ref={cardsRef} className={styles.cards}>
+          {/* Light for the glass to bend: the active vertical's accent and sand, drifting behind the stack. */}
+          <div className={styles.ambientTrack} aria-hidden="true">
+            <div className={styles.ambient}>
+              {verticals.map((vertical, index) => (
+                <div
+                  key={vertical.id}
+                  className={styles.ambientLayer}
+                  data-vertical={vertical.id}
+                  data-active={index === active || undefined}
+                >
+                  <span className={styles.blob} data-blob="accent" />
+                  <span className={styles.blob} data-blob="sand" />
+                  <span className={styles.blob} data-blob="glow" />
+                </div>
+              ))}
+            </div>
+          </div>
           {verticals.map((vertical, index) => (
             <Fragment key={vertical.id}>
               <header
@@ -418,9 +502,11 @@ export function StringChapter({ id, title, navLabel, countJoiner, verticals }: S
                       cardRefs.current[stackIndex] = element;
                     }}
                     className={styles.card}
+                    data-card
                     data-vertical={vertical.id}
                     style={{ "--stack-index": stackIndex } as CSSProperties}
                   >
+                    <span className={styles.glint} aria-hidden="true" />
                     <div className={styles.cardBody}>
                       <p className={styles.cardMeta}>
                         <span>
@@ -452,6 +538,17 @@ export function StringChapter({ id, title, navLabel, countJoiner, verticals }: S
             </Fragment>
           ))}
         </div>
+
+        {coda && (
+          <p className={styles.coda}>
+            <AnchorLink href={coda.href} className={styles.codaLink}>
+              {coda.label}
+              <svg viewBox="0 0 18 10" width="18" height="10" aria-hidden="true">
+                <path d="M0 5h16.5M12.5 1l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1" />
+              </svg>
+            </AnchorLink>
+          </p>
+        )}
       </div>
     </section>
   );

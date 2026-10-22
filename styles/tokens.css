@@ -50,8 +50,9 @@
   --tracking-display: -0.035em;
   --text-card-title: clamp(0.9375rem, 0.82rem + 0.3vw, 1.125rem);
 
-  /* Shape: one corner language for media across the page */
+  /* Shape: one corner language across the page. Media sits inside cards, so its radius is the smaller. */
   --radius-media: clamp(10px, 0.8vw, 16px);
+  --radius-card: clamp(18px, 1.6vw, 28px);
 
   /* Layout */
   --container-max: 1680px;

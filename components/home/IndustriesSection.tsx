@@ -27,6 +27,7 @@ export function IndustriesSection() {
       navLabel={stringChapter.navLabel}
       countJoiner={stringChapter.countJoiner}
       verticals={chapterVerticals}
+      coda={stringChapter.coda}
     />
   );
 }
