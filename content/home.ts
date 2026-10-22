@@ -59,6 +59,22 @@ export const about = {
   disciplines: ["Filmmakers", "Cinematographers", "Designers", "Editors", "Strategists", "Creative directors"],
 } as const;
 
+/** The Services index. The services themselves live in content/services.ts. */
+export const servicesIndex = {
+  title: "Services",
+  /** [COPY] One short line beside the heading. */
+  subline: "From one scroll-stopping post to a full launch, made under one roof.",
+} as const;
+
+/** The consultation tile that closes the Services index. */
+export const consultation = {
+  title: "Something else?",
+  body: "Get on a free 30-minute consultation call. We’ll find where AI can help you hit your business goals.",
+  label: "Book a free call",
+  /** [CONTENT] booking URL */
+  href: "#",
+} as const;
+
 /** [PARKED] Copy for HeroReel, which the hero no longer uses. */
 export const flagshipStage = {
   /** Caption over the flagship index, and the list's accessible name. */

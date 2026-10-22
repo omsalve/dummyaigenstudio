@@ -1,6 +1,7 @@
 import { About } from "@/components/home/About";
 import { Hero } from "@/components/home/Hero";
 import { IndustriesSection } from "@/components/home/IndustriesSection";
+import { Services } from "@/components/home/Services";
 import { ServicesSection } from "@/components/home/ServicesSection";
 
 // Order: Hero/HeroReel → Positioning → MassField (services) →
@@ -13,6 +14,7 @@ export default function Home() {
       <Hero />
       <ServicesSection />
       <About />
+      <Services />
       <IndustriesSection />
       {/* [SCAFFOLD] Engagements */}
       {/* [SCAFFOLD] Contact CTA */}
