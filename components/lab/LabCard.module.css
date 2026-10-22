@@ -1,0 +1,135 @@
+/*
+ * LabCard
+ *
+ * No box: the cover carries the card, on the page's media corner, with the
+ * text set under it like a magazine teaser. The two actions are the site's
+ * label links (tracked caps, an arrow that nudges on hover, a hairline that
+ * draws in), the reel link a shade quieter.
+ */
+
+.card {
+  /* Tuning */
+  --lab-title: clamp(1.375rem, 1.05rem + 0.9vw, 2rem);
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cover {
+  position: relative;
+  isolation: isolate;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-media);
+  background: color-mix(in srgb, var(--color-fg) 8%, transparent);
+}
+
+.image {
+  object-fit: cover;
+  transition: scale 900ms var(--ease-out);
+}
+
+.card:hover .image {
+  scale: 1.03;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin: 1.25rem 0 0;
+  color: var(--color-fg-muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.meta span::before {
+  content: "";
+  display: inline-block;
+  width: 1.5rem;
+  height: 1px;
+  margin-right: 0.75rem;
+  vertical-align: 0.3em;
+  background: var(--color-accent);
+}
+
+.title {
+  margin: 0.85rem 0 0;
+  font-size: var(--lab-title);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.excerpt {
+  max-width: 42ch;
+  margin: 0.75rem 0 0;
+  color: var(--color-fg-muted);
+  font-size: 1rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* Pushed to the card's foot, so the actions line up across a row. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.75rem;
+  margin: auto 0 0;
+  padding-top: 1.25rem;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-block: 0.625rem;
+  color: var(--color-fg);
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1.2;
+  text-decoration: none;
+  text-transform: uppercase;
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 calc(100% - 0.25rem) / 0 1px;
+  transition: background-size 450ms var(--ease-out);
+}
+
+.action + .action {
+  color: var(--color-fg-muted);
+}
+
+.action svg {
+  flex: none;
+  transition: transform 450ms var(--ease-out);
+}
+
+.action:hover {
+  background-size: calc(100% - 18px - 0.75rem) 1px;
+}
+
+.action:hover svg {
+  transform: translateX(0.3rem);
+}
+
+.action:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image,
+  .action,
+  .action svg {
+    transition: none;
+  }
+
+  .card:hover .image {
+    scale: none;
+  }
+}

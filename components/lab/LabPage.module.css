@@ -1,0 +1,269 @@
+/*
+ * Lab pages (/lab and /lab/[slug])
+ *
+ * The homepage's light sections, as pages: ivory, a back link set as a label
+ * at the top, then either the index (a big heading over the same three-across
+ * cards) or an article in a narrow reading column, its cover wider than the
+ * text, closing on the call to comment under the accent rule.
+ */
+
+.page {
+  /* Tuning */
+  --page-title: clamp(3rem, 1.6rem + 6vw, 8rem);
+  --article-title: clamp(2.25rem, 1.4rem + 3.4vw, 4.75rem);
+  --measure: 44rem; /* the reading column */
+
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: clamp(1.75rem, 5vh, 3rem) var(--gutter) clamp(6rem, 16vh, 10rem);
+  background: var(--color-bg);
+  color: var(--color-fg);
+}
+
+.inner {
+  max-width: var(--container-max);
+  margin-inline: auto;
+}
+
+/* ---------- The back link ---------- */
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-block: 0.625rem;
+  color: inherit;
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1.2;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.back svg {
+  flex: none;
+  transition: transform 450ms var(--ease-out);
+}
+
+.back:hover svg {
+  transform: translateX(-0.3rem);
+}
+
+.back:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* ---------- Index ---------- */
+
+.header {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  align-items: end;
+  margin-top: clamp(4rem, 14vh, 8rem);
+}
+
+.title {
+  grid-column: 1 / span 8;
+  margin: 0;
+  font-size: var(--page-title);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: var(--tracking-display);
+}
+
+.intro {
+  grid-column: 9 / -1;
+  max-width: 30ch;
+  margin: 0;
+  padding-bottom: calc(var(--page-title) * 0.08);
+  color: var(--color-fg-muted);
+  font-size: clamp(1rem, 0.94rem + 0.25vw, 1.1875rem);
+  line-height: 1.45;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(2.5rem, 6vh, 4rem) calc(var(--grid-gap) * 2);
+  margin: clamp(3rem, 9vh, 5.5rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---------- Article ---------- */
+
+.article {
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
+.articleHeader {
+  max-width: var(--measure);
+  margin: clamp(3.5rem, 12vh, 7rem) auto 0;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin: 0;
+  color: var(--color-fg-muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.meta span::before {
+  content: "";
+  display: inline-block;
+  width: 1.5rem;
+  height: 1px;
+  margin-right: 0.75rem;
+  vertical-align: 0.3em;
+  background: var(--color-accent);
+}
+
+.articleTitle {
+  margin: 1.25rem 0 0;
+  font-size: var(--article-title);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+.standfirst {
+  margin: 1.5rem 0 0;
+  color: var(--color-fg-muted);
+  font-size: clamp(1.125rem, 1rem + 0.45vw, 1.4375rem);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.articleCover {
+  position: relative;
+  isolation: isolate;
+  aspect-ratio: 16 / 9;
+  margin-top: clamp(2.5rem, 7vh, 4rem);
+  overflow: hidden;
+  border-radius: var(--radius-media);
+  background: color-mix(in srgb, var(--color-fg) 8%, transparent);
+}
+
+.image {
+  object-fit: cover;
+}
+
+.body {
+  max-width: var(--measure);
+  margin: clamp(2.5rem, 7vh, 4rem) auto 0;
+  font-size: clamp(1.0625rem, 1rem + 0.2vw, 1.1875rem);
+  line-height: 1.65;
+}
+
+.body p {
+  margin: 0 0 1.25em;
+}
+
+.getIt {
+  max-width: var(--measure);
+  margin: clamp(3rem, 9vh, 5rem) auto 0;
+  padding-top: clamp(1.75rem, 4vh, 2.5rem);
+  border-top: 2px solid var(--color-accent);
+}
+
+.getItTitle {
+  margin: 0;
+  font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.getItBody {
+  margin: 0.85rem 0 0;
+  color: var(--color-fg-muted);
+  font-size: clamp(1rem, 0.94rem + 0.25vw, 1.1875rem);
+  line-height: 1.45;
+}
+
+/* The ink pill, as the consultation tile's. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin-top: 1.75rem;
+  padding: 1.05rem 1.6rem;
+  border-radius: 999px;
+  background: var(--color-fg);
+  color: var(--color-bg);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    background-color 300ms var(--ease-out),
+    color 300ms var(--ease-out);
+}
+
+.button svg {
+  flex: none;
+  transition: transform 450ms var(--ease-out);
+}
+
+.button:hover {
+  background: var(--color-accent);
+  color: var(--color-fg);
+}
+
+.button:hover svg {
+  transform: translateX(0.3rem);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-fg);
+  outline-offset: 3px;
+}
+
+/* ---------- Tablets and phones. NARROW_QUERY is the lower part ---------- */
+
+@media (max-width: 1099.98px) {
+  .title,
+  .intro {
+    grid-column: 1 / -1;
+  }
+
+  .intro {
+    margin-top: 1.25rem;
+    padding-bottom: 0;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767.98px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .button {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back svg,
+  .button,
+  .button svg {
+    transition: none;
+  }
+}

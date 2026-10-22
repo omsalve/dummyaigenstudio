@@ -1,6 +1,7 @@
 import { About } from "@/components/home/About";
 import { Hero } from "@/components/home/Hero";
 import { IndustriesSection } from "@/components/home/IndustriesSection";
+import { Lab } from "@/components/home/Lab";
 import { Platforms } from "@/components/home/Platforms";
 import { Services } from "@/components/home/Services";
 import { ServicesSection } from "@/components/home/ServicesSection";
@@ -18,6 +19,7 @@ export default function Home() {
       <Services />
       <IndustriesSection />
       <Platforms />
+      <Lab />
       {/* [SCAFFOLD] Engagements */}
       {/* [SCAFFOLD] Contact CTA */}
     </main>

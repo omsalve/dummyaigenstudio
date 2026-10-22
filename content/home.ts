@@ -84,6 +84,29 @@ export const platformsRow = {
   codaAccent: "human minds",
 } as const;
 
+/**
+ * From the Lab, on the homepage and its own pages (/lab, /lab/[slug]). The
+ * posts live in content/lab.ts. {keyword} is replaced with each post's keyword.
+ */
+export const lab = {
+  title: "From the Lab",
+  /** [COPY] One line beside the heading. */
+  intro: "Free prompt packs, templates and workflows from the work we do every day.",
+  /** The homepage shows the latest few. */
+  latestCount: 3,
+  allLabel: "Everything from the Lab",
+  readLabel: "Read",
+  commentLabel: "Comment “{keyword}” on the reel",
+  /** Read after an external link's label by assistive tech. */
+  newTab: "opens in a new tab",
+  /** The article page's call to comment. */
+  getItTitle: "Get it free",
+  getItBody: "Comment “{keyword}” on the reel and we’ll send it to you by DM.",
+  backLabel: "From the Lab",
+  /** The index page's description; each post's is its excerpt. [COPY] */
+  description: "Free prompt packs, templates and workflows from an AI-led creative studio in Mumbai.",
+} as const;
+
 /** [PARKED] Copy for HeroReel, which the hero no longer uses. */
 export const flagshipStage = {
   /** Caption over the flagship index, and the list's accessible name. */
