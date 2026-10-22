@@ -1,0 +1,328 @@
+/*
+ * Services
+ *
+ * An editorial index rather than a grid of cards: the heading set big at the
+ * left with its subline answering at the right, then the services numbered
+ * 01–10 down two columns (column by column, like a contents page), each row
+ * a number hung beside its name, one line under it and a hairline above. The
+ * hovered row lifts its media into a small rounded thumbnail that trails the
+ * pointer (ServiceIndex.tsx). The consultation tile closes the list under a
+ * rule in the accent, set a step larger than the rows.
+ */
+
+.services {
+  /* Tuning (the thumbnail's lag and offset live in ServiceIndex.tsx) */
+  --services-pad-top: clamp(3rem, 8vh, 6rem);
+  --services-pad-bottom: clamp(6rem, 16vh, 11rem);
+  --services-title: clamp(3.25rem, 1.6rem + 6vw, 8.5rem);
+  --row-name: clamp(1.375rem, 0.95rem + 1.35vw, 2.375rem);
+  /* The brief asked for the line at 50%, but that's 3.2:1 on ivory, under AA's 4.5:1 at this size; 62% is the lightest that passes. */
+  --row-line-color: color-mix(in srgb, var(--color-fg) 62%, transparent);
+  --thumb-w: clamp(10rem, 13vw, 15rem);
+  --thumb-ratio: 4 / 3;
+  --row-hover: 350ms;
+
+  padding: var(--services-pad-top) var(--gutter) var(--services-pad-bottom);
+  background: var(--color-bg);
+  color: var(--color-fg);
+}
+
+.inner {
+  max-width: var(--container-max);
+  margin-inline: auto;
+}
+
+/* ---------- Heading ---------- */
+
+.head {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  align-items: end;
+}
+
+.title {
+  grid-column: 1 / span 7;
+  margin: 0;
+  font-size: var(--services-title);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: var(--tracking-display);
+}
+
+.subline {
+  grid-column: 9 / -1;
+  max-width: 30ch;
+  margin: 0;
+  /* Rests on the title's baseline. */
+  padding-bottom: calc(var(--services-title) * 0.1);
+  color: var(--color-fg-muted);
+  font-size: clamp(1rem, 0.94rem + 0.25vw, 1.1875rem);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* ---------- The index ---------- */
+
+/* Column by column: --rows (set inline) is half the count, rounded up. */
+.list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows, 5), auto);
+  grid-auto-flow: column;
+  column-gap: calc(var(--grid-gap) * 2);
+  margin: clamp(3rem, 9vh, 5.5rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr);
+  padding-block: clamp(1.25rem, 3vh, 1.75rem);
+  border-top: 1px solid var(--color-rule);
+  transition: border-color var(--row-hover) ease;
+}
+
+/* The hovered row lifts its thumbnail over its neighbours. */
+.row[data-hover] {
+  z-index: 1;
+  border-top-color: var(--color-fg);
+}
+
+.number {
+  /* Centred on the name's first line of capitals. */
+  padding-top: calc(var(--row-name) * 0.55 - 0.5em);
+  color: var(--row-line-color);
+  font-size: var(--text-label);
+  font-weight: var(--weight-label);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.name {
+  margin: 0;
+  font-size: var(--row-name);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.link {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* The whole row is the link's hit area. */
+.link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.link:focus-visible {
+  outline: none;
+}
+
+.link:focus-visible::after {
+  outline: 1px solid var(--color-fg);
+  outline-offset: 4px;
+}
+
+.line {
+  max-width: 38ch;
+  margin: 0.5rem 0 0;
+  color: var(--row-line-color);
+  font-size: clamp(0.9375rem, 0.9rem + 0.12vw, 1rem);
+  line-height: 1.45;
+}
+
+/* ---------- The floating media ---------- */
+
+/* Off by default: only fine pointers on the desktop layout, with motion allowed, ever show it. */
+.thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  display: none;
+  isolation: isolate;
+  width: var(--thumb-w);
+  aspect-ratio: var(--thumb-ratio);
+  overflow: hidden;
+  border-radius: var(--radius-media);
+  background: color-mix(in srgb, var(--color-fg) 8%, transparent);
+  opacity: 0;
+  scale: 0.9;
+  pointer-events: none;
+  transition:
+    opacity 260ms var(--ease-out),
+    scale 480ms var(--ease-out);
+}
+
+/* Keep in sync with HOVER_QUERY (ServiceIndex.tsx) and NARROW_QUERY. */
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .thumb {
+    display: block;
+  }
+}
+
+.row[data-hover] .thumb {
+  opacity: 1;
+  scale: 1;
+}
+
+.thumbMedia {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Consultation ---------- */
+
+.consult {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  align-items: end;
+  margin-top: clamp(3rem, 8vh, 5rem);
+  padding-top: clamp(1.75rem, 4vh, 2.5rem);
+  border-top: 2px solid var(--color-accent);
+}
+
+.consultTitle {
+  grid-column: 1 / span 5;
+  margin: 0;
+  font-size: calc(var(--row-name) * 1.35);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.consultBody {
+  grid-column: 6 / span 4;
+  max-width: 40ch;
+  margin: 0;
+  color: var(--color-fg-muted);
+  font-size: clamp(1rem, 0.94rem + 0.25vw, 1.1875rem);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.button {
+  display: inline-flex;
+  grid-column: 10 / -1;
+  align-items: center;
+  justify-self: end;
+  gap: 0.875rem;
+  padding: 1.05rem 1.6rem;
+  border-radius: 999px;
+  background: var(--color-fg);
+  color: var(--color-bg);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition:
+    background-color 300ms var(--ease-out),
+    color 300ms var(--ease-out);
+}
+
+.button svg {
+  flex: none;
+  transition: transform 450ms var(--ease-out);
+}
+
+/* Ink on the accent: 5.3:1. */
+.button:hover {
+  background: var(--color-accent);
+  color: var(--color-fg);
+}
+
+.button:hover svg {
+  transform: translateX(0.3rem);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-fg);
+  outline-offset: 3px;
+}
+
+/* ---------- Tablets ---------- */
+
+@media (min-width: 768px) and (max-width: 1099.98px) {
+  .title {
+    grid-column: 1 / -1;
+  }
+
+  .subline {
+    grid-column: 1 / span 8;
+    margin-top: 1.5rem;
+    padding-bottom: 0;
+  }
+
+  .consultTitle {
+    grid-column: 1 / -1;
+  }
+
+  .consultBody {
+    grid-column: 1 / span 8;
+    margin-top: 1rem;
+  }
+
+  .button {
+    grid-column: 9 / -1;
+  }
+}
+
+/* ---------- Phones. Keep in sync with NARROW_QUERY ---------- */
+
+@media (max-width: 767.98px) {
+  .title,
+  .subline,
+  .consultTitle,
+  .consultBody,
+  .button {
+    grid-column: 1 / -1;
+  }
+
+  .subline {
+    margin-top: 1.25rem;
+    padding-bottom: 0;
+  }
+
+  .list {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-auto-flow: row;
+  }
+
+  .row {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+  }
+
+  .consultBody {
+    margin-top: 1rem;
+  }
+
+  .button {
+    justify-self: start;
+    margin-top: 1.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row,
+  .button,
+  .button svg {
+    transition: none;
+  }
+}

@@ -15,6 +15,7 @@
   --lmr-ink: #1a1a1a;
   --lmr-sand: #d9c9b8;
   --lmr-stone: #6b6b63;
+  --lmr-solar: #ff4d12;
 
   /* Colour */
   --color-bg: var(--lmr-ivory);
@@ -22,6 +23,8 @@
   --color-fg-muted: var(--lmr-stone);
   --color-rule: color-mix(in srgb, var(--lmr-ink) 16%, transparent);
   --color-on-media: var(--lmr-ivory);
+  /* The brand's one pop of colour outside the verticals (Solar, first on the board). Rules and fills, not text: 3:1 on ivory. */
+  --color-accent: var(--lmr-solar);
 
   /* Type */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -69,7 +72,7 @@
  * Jewellery, citrus Pharma.
  */
 [data-vertical="solar"] {
-  --v-accent: #ff4d12;
+  --v-accent: var(--lmr-solar);
   --v-deep: #1a1a1a;
   --v-paper: #f7f5f0;
   --v-sand: #d9c9b8;

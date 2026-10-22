@@ -57,7 +57,7 @@ export function Reveal({ children, className }: RevealProps) {
             }),
       );
       const blocks = targets.filter((_, index) => !splits[index]);
-      gsap.set(blocks, { y: RISE, opacity: 0 });
+      if (blocks.length) gsap.set(blocks, { y: RISE, opacity: 0 });
 
       ScrollTrigger.create({
         trigger: root,
@@ -78,7 +78,7 @@ export function Reveal({ children, className }: RevealProps) {
                   split?.revert();
                   split?.kill();
                 }
-                gsap.set(blocks, { clearProps: "transform,opacity" });
+                if (blocks.length) gsap.set(blocks, { clearProps: "transform,opacity" });
               },
             },
           );
