@@ -107,6 +107,15 @@ export const lab = {
   description: "Free prompt packs, templates and workflows from an AI-led creative studio in Mumbai.",
 } as const;
 
+/** Why the work is unbranded: the last section before the contact slot. The industries chapter links here. */
+export const discretion = {
+  /** Anchor for the "Why is this work unbranded?" link (stringChapter.coda). */
+  id: "discretion",
+  eyebrow: "A note on what you’re seeing",
+  headline: "Our clients are discreet. So are we.",
+  body: "A lot of the work on this site is unbranded or recreated, on purpose. The brands we work with value their privacy, and we intend to keep it that way. That should tell you something: your confidentiality is safe with us too. Dummy or not, every frame you see here is 101% created or recreated by our team.",
+} as const;
+
 /** [PARKED] Copy for HeroReel, which the hero no longer uses. */
 export const flagshipStage = {
   /** Caption over the flagship index, and the list's accessible name. */
@@ -148,5 +157,5 @@ export const stringChapter = {
   /** Word between the current numeral and the total, set as "OF 04". */
   countJoiner: "of",
   /** Small link under the last card, to the note on why the work is unbranded. */
-  coda: { label: "Why is this work unbranded?", href: "#discretion" },
+  coda: { label: "Why is this work unbranded?", href: `#${discretion.id}` },
 } as const;

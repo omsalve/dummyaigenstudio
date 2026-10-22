@@ -1,4 +1,5 @@
 import { About } from "@/components/home/About";
+import { Discretion } from "@/components/home/Discretion";
 import { Hero } from "@/components/home/Hero";
 import { IndustriesSection } from "@/components/home/IndustriesSection";
 import { Lab } from "@/components/home/Lab";
@@ -20,6 +21,7 @@ export default function Home() {
       <IndustriesSection />
       <Platforms />
       <Lab />
+      <Discretion />
       {/* [SCAFFOLD] Engagements */}
       {/* [SCAFFOLD] Contact CTA */}
     </main>
