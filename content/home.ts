@@ -10,7 +10,10 @@ export const meta = {
 
 export const hero = {
   /**
-   * The h1, as two lines: each `lead` word in full white, the `rest` at half strength.
+   * The h1, as two phrases above "Reality", each on one line: each `lead` word in full white,
+   * the `rest` at half strength. The first sits at the left, the second at the right, a little
+   * higher. Hero.module.css sizes them from their measured widths (--hero-phrases-em and
+   * --hero-phrase-em): re-measure those if these change.
    * [COPY] Alternates:
    *   "Light, bent to your story." / "Matter, made worth wanting."
    *   "Light, directed." / "Matter, made tangible."
@@ -20,29 +23,39 @@ export const hero = {
     { lead: "Matter", rest: " that makes them buy." },
   ],
   /**
-   * Set huge in the script between the plate and its subject. Decorative on
-   * screen; the h1 ends on it for assistive tech, completing the trio.
+   * Set large in the script between the plate and its subject, so it stands on
+   * the hill behind the desk. Decorative on screen; the h1 ends on it for
+   * assistive tech, completing the trio.
    */
   reality: "Reality",
   /** Primary action, as on the palette board's hero panels. Points at the industries chapter. */
   action: { label: "Explore work", href: "#work" },
   /**
-   * One image built as a depth sandwich: `background` is the full plate and
+   * One image built as a depth sandwich: `background` is the sky plate and
    * `subject` a cut-out with alpha on the same canvas (same size, same
-   * registration), with "Reality" set between them. Desktop crops are 16:9,
-   * mobile crops 9:16; portrait screens get the mobile crop.
-   * [ASSET] Generated placeholders in /public/media/hero. Keep the subject
-   * clear of the lower left, where the copy sits.
+   * registration): the hill, the desk set on it and the far hills. "Reality"
+   * sits between them. Under the subject the plate carries sky, so parallax
+   * never shows a second copy of the hill. Desktop crops are 3696×2016 (cut
+   * from the 4K render inside its frame line), mobile crops 9:16, centred on
+   * the desk; portrait screens get the mobile crop.
    */
   image: {
-    background: { desktop: "/media/hero/hero-bg.jpg", mobile: "/media/hero/hero-bg-mobile.jpg" },
-    subject: { desktop: "/media/hero/hero-subject.png", mobile: "/media/hero/hero-subject-mobile.png" },
-    /** [COPY] One line describing the final image. This one describes the placeholder. */
-    alt: "An orange sphere hanging in front of a flat cobalt backdrop.",
-    /** Tuning: where the centre of "Reality" sits on each crop. */
-    realityPosition: {
-      desktop: { x: "50%", y: "38%" },
-      mobile: { x: "50%", y: "30%" },
+    background: { desktop: "/media/hero/hero-sky.jpg", mobile: "/media/hero/hero-sky-mobile.jpg" },
+    subject: { desktop: "/media/hero/hero-hilltop.png", mobile: "/media/hero/hero-hilltop-mobile.png" },
+    alt: "A wooden desk and chair on a grassy hilltop under a wide blue sky, a laptop open on the desk with an edit timeline on screen.",
+    /** Each crop's width ÷ height. "Reality" is placed in the image's own coordinates, so it holds its place on the desk at any screen shape. */
+    aspect: { desktop: 3696 / 2016, mobile: 1134 / 2016 },
+    /**
+     * Where "Reality" stands on each crop: centred on x, its baseline on y, as fractions of the
+     * crop's width and height. On the wide crop, along the desk's front edge, so its letters rise
+     * clear of the desk top and the chair, laptop and desk cut across their feet. On the tall crop
+     * the desk set is wider than the word can be, so the baseline sits higher, on the laptop's top
+     * edge: only the chair's back crosses the letters. Tuning, with the word's size in
+     * Hero.module.css.
+     */
+    reality: {
+      desktop: { x: 0.504, y: 0.598 },
+      mobile: { x: 0.5, y: 0.515 },
     },
   },
 } as const;
