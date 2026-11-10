@@ -19,7 +19,7 @@ export const serviceGroups: readonly ServiceGroup[] = [
 ];
 
 /**
- * Every service, in the order the Services section numbers them (01–10).
+ * Every service, in the order the Services section numbers them (01–09).
  * MassField lists the same services by group, using `shortName`.
  *
  * [ASSET] `media` points at stand-ins already in /public/media: the flagship
@@ -68,17 +68,6 @@ export const services: readonly Service[] = [
       kind: "video",
       src: "/media/flagship/standin/flagship-04.webm",
       poster: "/media/flagship/standin/flagship-04.jpg",
-    },
-  },
-  {
-    name: "Brand Films",
-    shortName: "Brand films",
-    line: "Real production and AI, in one film.",
-    group: "light",
-    media: {
-      kind: "video",
-      src: "/media/flagship/standin/flagship-02.webm",
-      poster: "/media/flagship/standin/flagship-02.jpg",
     },
   },
   {

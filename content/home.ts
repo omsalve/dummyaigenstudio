@@ -40,8 +40,8 @@ export const hero = {
    * the desk; portrait screens get the mobile crop.
    */
   image: {
-    background: { desktop: "/media/hero/hero-sky.jpg", mobile: "/media/hero/hero-sky-mobile.jpg" },
-    subject: { desktop: "/media/hero/hero-hilltop.png", mobile: "/media/hero/hero-hilltop-mobile.png" },
+    background: { desktop: "/media/hero/hero-desk-sky.jpg", mobile: "/media/hero/hero-desk-sky-mobile.jpg" },
+    subject: { desktop: "/media/hero/hero-desk.png", mobile: "/media/hero/hero-desk-mobile.png" },
     alt: "A wooden desk and chair on a grassy hilltop under a wide blue sky, a laptop open on the desk with an edit timeline on screen.",
     /** Each crop's width ÷ height. "Reality" is placed in the image's own coordinates, so it holds its place on the desk at any screen shape. */
     aspect: { desktop: 3696 / 2016, mobile: 1134 / 2016 },
@@ -67,9 +67,13 @@ export const about = {
   statement: "We were here before AI.",
   /** Set in the script. A word or two, lowercase, verbatim from the statement. */
   statementAccent: "before",
-  body: "We’re an end-to-end production partner. Anything that needs real-world production (shoots, sets, crews, edits) we cover too. AI makes us faster. Years of doing it the hard way make us good.",
+  /** One paragraph per entry. The last one stands alone, set in full ink, as the point of the section. */
+  body: [
+    "We’re an end-to-end production partner. Anything that needs real-world production (shoots, sets, crews, edits) we cover too. AI makes us faster.",
+    "Years of doing it the hard way make us good.",
+  ],
   /** The disciplines in the studio, set small under the body. Optional: an empty list hides the line. */
-  disciplines: ["Filmmakers", "Cinematographers", "Designers", "Editors", "Strategists", "Creative directors"],
+  disciplines: ["Filmmakers", "Cinematographers", "Editors", "Designers", "Strategists", "Creative directors"],
 } as const;
 
 /** The Services index. The services themselves live in content/services.ts. */

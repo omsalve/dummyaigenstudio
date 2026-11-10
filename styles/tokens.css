@@ -12,13 +12,16 @@
 :root {
   /* Palette primitives — the board's shared neutrals */
   --lmr-ivory: #f7f5f0;
+  /* The page's ground: a clean, bright white in place of the board's ivory. Ivory stays for type on media. */
+  --lmr-gloss: #fcfcfb;
+  --lmr-lime: #d7ff00;
   --lmr-ink: #1a1a1a;
   --lmr-sand: #d9c9b8;
   --lmr-stone: #6b6b63;
   --lmr-solar: #ff4d12;
 
   /* Colour */
-  --color-bg: var(--lmr-ivory);
+  --color-bg: var(--lmr-gloss);
   --color-fg: var(--lmr-ink);
   --color-fg-muted: var(--lmr-stone);
   --color-rule: color-mix(in srgb, var(--lmr-ink) 16%, transparent);
@@ -89,7 +92,7 @@
 }
 
 [data-vertical="citrus"] {
-  --v-accent: #d7ff00;
+  --v-accent: var(--lmr-lime);
   --v-deep: #1f2a1f;
   --v-paper: #f7f4ee;
   --v-sand: #d8cdba;

@@ -25,9 +25,11 @@ export function About() {
           {statement.accent && <span className={styles.accent}>{statement.accent}</span>}
           {statement.after}
         </h2>
-        <p className={styles.body} data-reveal>
-          {about.body}
-        </p>
+        {about.body.map((paragraph) => (
+          <p key={paragraph} className={styles.body} data-reveal>
+            {paragraph}
+          </p>
+        ))}
         {about.disciplines.length > 0 && (
           <ul className={styles.disciplines} data-reveal="block">
             {about.disciplines.map((discipline) => (

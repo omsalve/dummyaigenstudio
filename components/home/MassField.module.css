@@ -20,9 +20,13 @@
 }
 
 .root {
-  /* Colour: this chapter is set in ink, with the board's ivory as its light. */
-  --field-bg: var(--lmr-ink);
-  --field-fg: var(--lmr-ivory);
+  /*
+   * Colour: glossy white, set in ink. The ground sits a shade under the page's
+   * white so the glow can read as a sheen of pure white across it.
+   */
+  --field-bg: color-mix(in srgb, var(--lmr-gloss) 96%, var(--lmr-ink));
+  --field-fg: var(--lmr-ink);
+  --field-sheen: #fff;
   --field-dim: color-mix(in srgb, var(--field-fg) 25%, transparent); /* words off the hairline */
   --field-muted: color-mix(in srgb, var(--field-fg) 62%, transparent); /* captions, notes, cue */
   --field-rule: color-mix(in srgb, var(--field-fg) 18%, transparent);
@@ -45,7 +49,7 @@
   --field-crossfade: 700ms;
   --field-morph: 900ms; /* the frame changing shape */
 
-  /* The page's semantic colours, inverted for this chapter. */
+  /* The page's semantic colours, for this chapter. */
   --color-bg: var(--field-bg);
   --color-fg: var(--field-fg);
   --color-rule: var(--field-rule);
@@ -101,8 +105,8 @@
   border-radius: 50%;
   background: radial-gradient(
     closest-side,
-    color-mix(in srgb, var(--field-fg) 15%, transparent),
-    color-mix(in srgb, var(--field-fg) 6%, transparent) 45%,
+    var(--field-sheen),
+    color-mix(in srgb, var(--field-sheen) 55%, transparent) 45%,
     transparent
   );
   will-change: transform;
@@ -115,7 +119,8 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 220px;
   mix-blend-mode: overlay;
-  opacity: 0.32;
+  /* Barely there on the white: enough to keep the sheen from banding, not enough to dull the gloss. */
+  opacity: 0.12;
   pointer-events: none;
 }
 
@@ -160,12 +165,12 @@
   opacity: 1;
 }
 
-/* Difference-blended over the image, so it inverts whatever passes beneath it. */
+/* White, difference-blended over the image, so it inverts whatever passes beneath it. */
 .frameLabel {
   position: absolute;
   top: 50%;
   left: 50%;
-  color: var(--field-fg);
+  color: #fff;
   font-size: 0.8125rem;
   letter-spacing: 0.16em;
   line-height: 1;

@@ -11,8 +11,8 @@ import { ServicesSection } from "@/components/home/ServicesSection";
 // field) → About → Services (the index, closing on the consultation tile) →
 // StringChapter (IndustriesSection, #work) → Platforms → From the Lab →
 // Discretion (#discretion) → Contact CTA.
-// Dark first (Hero, MassField), light from About on, edge to edge with no
-// gradients between sections.
+// The hero's photograph, then glossy white throughout, broken once by About's
+// band of Citrus lime; edge to edge with no gradients between sections.
 // [SCAFFOLD] The Contact CTA wasn't in this repo; its slot is marked below.
 export default function Home() {
   return (
